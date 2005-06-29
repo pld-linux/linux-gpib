@@ -26,7 +26,7 @@ Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # Source0-md5:	65044161fe86a815c9c159fe301d85c4
 #Source1:	-
 # Source1-md5:	-
-#Patch0:		%{name}-what.patch
+Patch0:		%{name}-Makefile.am.patch
 URL:		http://linux-gpib.sourceforge.net/
 %if %{with kernel}
 %{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.7}
@@ -95,6 +95,7 @@ Ten pakiet zawiera modu³ j±dra Linuksa SMP.
 %prep
 
 %setup -q
+%patch0 -p1
 
 %build
 %{__aclocal} -I m4
@@ -110,16 +111,15 @@ Ten pakiet zawiera modu³ j±dra Linuksa SMP.
 	--disable-tcl-binding \
 	--disable-documentation
 
-##%{__make}	
 %if %{with userspace}
-
+%{__make}
 
 %endif
 
+%if %{with kernel}
 cd driver
 for i in agilent_82350b agilent_82357a cb7210 hp82335 hp_82341 nec7210 tms9914 tnt4882 cec ines pc2 sys; do
 cd $i
-%if %{with kernel}
 # kernel module(s)
 for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}; do
 	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
@@ -161,18 +161,23 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 	
 	mv $i{,-$cfg}.ko
 done
-%endif 
 cd ..
 done
+%endif 
 
 
 
 %install
 rm -rf $RPM_BUILD_ROOT
+HOTPLUG_USB_CONF_DIR=/etc/hotplug/usb
+USB_FIRMWARE_DIR=/usr/share/usb/
 
+install -d $RPM_BUILD_ROOT{$HOTPLUG_USB_CONF_DIR,$USB_FIRMWARE_DIR}
 %if %{with userspace}
-
-
+%{__make} install \
+	DESTDIR=$RPM_BUILD_ROOT \
+	HOTPLUG_USB_CONF_DIR=$RPM_BUILD_ROOT$HOTPLUG_USB_CONF_DIR \
+	USB_FIRMWARE_DIR=$RPM_BUILD_ROOT$USB_FIRMWARE_DIR
 %endif
 
 %if %{with kernel}

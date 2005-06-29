@@ -117,7 +117,7 @@ Ten pakiet zawiera modu³ j±dra Linuksa SMP.
 %endif
 
 cd driver
-for i in agilent_82350b agilent_82357a cb7210 cec hp82335 hp_82341 ines nec7210 pc2 sys tms9914 tnt4882; do
+for i in agilent_82350b agilent_82357a cb7210 hp82335 hp_82341 nec7210 tms9914 tnt4882 cec ines pc2 sys; do
 cd $i
 %if %{with kernel}
 # kernel module(s)
@@ -131,13 +131,12 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h include/linux/autoconf.h
 	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm
 	touch include/config/MARKER
-#
-#	patching/creating makefile(s) (optional)
+
 	cp -rdp ../include/* include
 	install -d include/gpib
 	cp -rdp include/gpib_user.h include/gpib
 	cp -rdp ../../config.h include
-#
+
 	%{__make} -C %{_kernelsrcdir} clean \
 		RCS_FIND_IGNORE="-name '*.ko' -o" \
 		M=$PWD O=$PWD \
@@ -147,12 +146,26 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 		M=$PWD O=$PWD \
 		%{?with_verbose:V=1}
 		
-
+	if [ "$i" == "sys" ]; then
+	    i=gpib_common
+	fi
+	if [ "$i" == "cec" ]; then
+	    i=cec_gpib
+	fi
+	if [ "$i" == "ines" ]; then
+	    i=ines_gpib
+	fi
+	if [ "$i" == "pc2" ]; then
+	    i=pc2_gpib
+	fi
+	
 	mv $i{,-$cfg}.ko
 done
 %endif 
 cd ..
 done
+
+
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -163,33 +176,59 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %if %{with kernel}
-install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/MODULE_DIR
-install MODULE_NAME-%{?with_dist_kernel:up}%{!?with_dist_kernel:nondist}.ko \
-	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/MODULE_DIR/MODULE_NAME.ko
+install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/misc
+
+cd driver
+for i in agilent_82350b agilent_82357a cb7210 hp82335 hp_82341 nec7210 tms9914 tnt4882 cec ines pc2 sys; do
+cd $i
+	if [ "$i" == "sys" ]; then
+	    i=gpib_common
+	fi
+	if [ "$i" == "cec" ]; then
+	    i=cec_gpib
+	fi
+	if [ "$i" == "ines" ]; then
+	    i=ines_gpib
+	fi
+	if [ "$i" == "pc2" ]; then
+	    i=pc2_gpib
+	fi
+
+install $i-%{?with_dist_kernel:up}%{!?with_dist_kernel:nondist}.ko \
+	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/$i.ko
 %if %{with smp} && %{with dist_kernel}
-install MODULE_NAME-smp.ko \
-	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/MODULE_DIR/MODULE_NAME.ko
+install $i-smp.ko \
+	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/$i.ko
+cd ..	
+done
 %endif
 %endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post
+%post -n kernel-%{mod_name}
 %depmod %{_kernel_ver}
 
-%postun
+%postun -n kernel-%{mod_name}
 %depmod %{_kernel_ver}
 
-#%post	-n kernel-smp-MODULE_DIR-%{name}
-#%depmod %{_kernel_ver}smp
+%post	-n kernel-smp-%{mod_name}
+%depmod %{_kernel_ver}smp
 
-#%postun	-n kernel-smp-MODULE_DIR-%{name}
-#%depmod %{_kernel_ver}smp
+%postun	-n kernel-smp-%{mod_name}
+%depmod %{_kernel_ver}smp
 
 %if %{with kernel}
-%files 
+%files -n kernel-%{mod_name}
 #%defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}/MODULE_DIR/*.ko*
+/lib/modules/%{_kernel_ver}/misc/*.ko*
+
+
+%if %{with smp} && %{with dist_kernel}
+%files -n kernel-smp-%{mod_name}
+%defattr(644,root,root,755)
+/lib/modules/%{_kernel_ver}smp/misc/*.ko*
+%endif
 
 %endif

@@ -110,13 +110,15 @@ Ten pakiet zawiera modu³ j±dra Linuksa SMP.
 	--disable-tcl-binding \
 	--disable-documentation
 
-%{__make}	
+##%{__make}	
 %if %{with userspace}
 
 
 %endif
 
-
+cd driver
+for i in agilent_82350b agilent_82357a cb7210 cec hp82335 hp_82341 ines nec7210 pc2 sys tms9914 tnt4882; do
+cd $i
 %if %{with kernel}
 # kernel module(s)
 for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}; do
@@ -131,6 +133,10 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 	touch include/config/MARKER
 #
 #	patching/creating makefile(s) (optional)
+	cp -rdp ../include/* include
+	install -d include/gpib
+	cp -rdp include/gpib_user.h include/gpib
+	cp -rdp ../../config.h include
 #
 	%{__make} -C %{_kernelsrcdir} clean \
 		RCS_FIND_IGNORE="-name '*.ko' -o" \
@@ -140,10 +146,13 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 		CC="%{__cc}" CPP="%{__cpp}" \
 		M=$PWD O=$PWD \
 		%{?with_verbose:V=1}
+		
 
-##	mv MODULE_NAME{,-$cfg}.ko
+	mv $i{,-$cfg}.ko
 done
-%endif
+%endif 
+cd ..
+done
 
 %install
 rm -rf $RPM_BUILD_ROOT

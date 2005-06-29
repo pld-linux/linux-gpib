@@ -1,7 +1,4 @@
 #
-# Replace MODULE_NAME with real module name and MODULE_DIR
-# with required directory name.
-#
 # Conditional build:
 %bcond_without	dist_kernel	# allow non-distribution kernel
 %bcond_without	kernel		# don't build kernel modules
@@ -11,6 +8,9 @@
 #
 # main package.
 #
+
+%define		mod_name	gpib
+
 Summary:	GPIB Linux Support
 Summary(pl):	Sterowniki GPIB dkla Linuksa
 Name:		linux-gpib
@@ -23,7 +23,7 @@ Group:		Unknown
 Vendor:		PLD
 #Icon:		-
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-# Source0-md5:	-
+# Source0-md5:	65044161fe86a815c9c159fe301d85c4
 #Source1:	-
 # Source1-md5:	-
 #Patch0:		%{name}-what.patch
@@ -33,14 +33,14 @@ URL:		http://linux-gpib.sourceforge.net/
 BuildRequires:	rpmbuild(macros) >= 1.153
 %endif
 BuildRequires:	kernel-headers >= 2.6.8
-PreReq:		-
+#PreReq:		-
 Requires(pre,post):	kernel >= 2.6.8
-Requires(preun):	-
-Requires(postun):	-
-Requires:	kernel_up >=2.6.8
-Provides:	-
-Obsoletes:	-
-Conflicts:	-
+#Requires(preun):	-
+#Requires(postun):	-
+Requires:	kernel-up >= 2.6.8
+#Provides:	-
+#Obsoletes:	-
+#Conflicts:	-
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -48,9 +48,74 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %description -l pl
 
 # kernel subpackages.
+
+%package -n kernel-%{mod_name}
+Summary:        Linux driver for %{name}
+Summary(pl):    Sterownik dla Linuksa do %{name}
+Release:        %{_rel}@%{_kernel_ver_str}
+Group:          Base/Kernel
+Requires(post,postun):  /sbin/depmod
+%if %{with dist_kernel}
+%requires_releq_kernel_up
+Requires(postun):       %releq_kernel_up
+%endif
+
+%description -n kernel-%{mod_name}
+This is driver for %{name} for Linux.
+
+This package contains Linux module.
+
+%description -n kernel-%{mod_name} -l pl
+Sterownik dla Linuksa do %{name}.
+
+Ten pakiet zawiera modu³ j±dra Linuksa.
+
+%package -n kernel-smp-%{mod_name}
+Summary:        Linux SMP driver for %{name}
+Summary(pl):    Sterownik dla Linuksa SMP do %{name}
+Release:        %{_rel}@%{_kernel_ver_str}
+Group:          Base/Kernel
+Requires(post,postun):  /sbin/depmod
+%if %{with dist_kernel}
+%requires_releq_kernel_smp
+Requires(postun):       %releq_kernel_smp
+%endif
+
+%description -n kernel-smp-%{mod_name}
+This is driver for %{name} for Linux.
+
+This package contains Linux SMP module.
+
+%description -n kernel-smp-%{mod_name} -l pl
+Sterownik dla Linuksa do %{name}.
+
+Ten pakiet zawiera modu³ j±dra Linuksa SMP.
+
+
 %prep
 
+%setup -q
+
 %build
+%{__aclocal} -I m4
+%{__libtoolize}
+%{__autoconf}
+%{__automake}
+
+%configure \
+	--disable-guile-binding \
+	--disable-perl-binding \
+	--disable-php-binding \
+	--disable-python-binding \
+	--disable-tcl-binding \
+	--disable-documentation
+
+%{__make}	
+%if %{with userspace}
+
+
+%endif
+
 
 %if %{with kernel}
 # kernel module(s)
@@ -76,7 +141,7 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 		M=$PWD O=$PWD \
 		%{?with_verbose:V=1}
 
-	mv MODULE_NAME{,-$cfg}.ko
+##	mv MODULE_NAME{,-$cfg}.ko
 done
 %endif
 
@@ -101,32 +166,21 @@ install MODULE_NAME-smp.ko \
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post	-n kernel-MODULE_DIR-%{name}
+%post
 %depmod %{_kernel_ver}
 
-%postun	-n kernel-MODULE_DIR-%{name}
+%postun
 %depmod %{_kernel_ver}
 
-%post	-n kernel-smp-MODULE_DIR-%{name}
-%depmod %{_kernel_ver}smp
+#%post	-n kernel-smp-MODULE_DIR-%{name}
+#%depmod %{_kernel_ver}smp
 
-%postun	-n kernel-smp-MODULE_DIR-%{name}
-%depmod %{_kernel_ver}smp
+#%postun	-n kernel-smp-MODULE_DIR-%{name}
+#%depmod %{_kernel_ver}smp
 
 %if %{with kernel}
-%files -n kernel-MODULE_DIR-%{name}
-%defattr(644,root,root,755)
+%files 
+#%defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/MODULE_DIR/*.ko*
-
-%if %{with smp} && %{with dist_kernel}
-%files -n kernel-smp-MODULE_DIR-%{name}
-%defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}smp/MODULE_DIR/*.ko*
-%endif
-%endif
-
-%if %{with userspace}
-%files
-%defattr(644,root,root,755)
 
 %endif

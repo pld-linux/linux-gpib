@@ -17,15 +17,10 @@ Name:		linux-gpib
 Version:	3.2.05
 %define		_rel	0.1
 Release:	%{_rel}
-#Epoch:		
 License:	GPL
-Group:		Unknown
-Vendor:		PLD
-#Icon:		-
-Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+Group:		Applications/System
+Source0:	http://dl.sourceforge.net/linux-gpib/%{name}-%{version}.tar.gz
 # Source0-md5:	65044161fe86a815c9c159fe301d85c4
-#Source1:	-
-# Source1-md5:	-
 Patch0:		%{name}-Makefile.am.patch
 URL:		http://linux-gpib.sourceforge.net/
 %if %{with kernel}
@@ -33,19 +28,15 @@ URL:		http://linux-gpib.sourceforge.net/
 BuildRequires:	rpmbuild(macros) >= 1.153
 %endif
 BuildRequires:	kernel-headers >= 2.6.8
-#PreReq:		-
 Requires(pre,post):	kernel >= 2.6.8
-#Requires(preun):	-
-#Requires(postun):	-
 Requires:	kernel-up >= 2.6.8
-#Provides:	-
-#Obsoletes:	-
-#Conflicts:	-
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
+The Linux GPIB package provides support for GPIB (IEEE 488) hardware.
 
 %description -l pl
+Pakiet Linux GPIB s³u¿y do obs³ugi sprzêtu GPIB (IEEE 488).
 
 # kernel subpackages.
 
@@ -91,9 +82,7 @@ Sterownik dla Linuksa do %{name}.
 
 Ten pakiet zawiera modu³ j±dra Linuksa SMP.
 
-
 %prep
-
 %setup -q
 %patch0 -p1
 
@@ -113,7 +102,6 @@ Ten pakiet zawiera modu³ j±dra Linuksa SMP.
 
 %if %{with userspace}
 %{__make}
-
 %endif
 
 %if %{with kernel}
@@ -164,8 +152,6 @@ done
 cd ..
 done
 %endif 
-
-
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -229,11 +215,9 @@ rm -rf $RPM_BUILD_ROOT
 #%defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/misc/*.ko*
 
-
 %if %{with smp} && %{with dist_kernel}
 %files -n kernel-smp-%{mod_name}
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}smp/misc/*.ko*
 %endif
-
 %endif

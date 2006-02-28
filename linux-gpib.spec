@@ -11,11 +11,11 @@
 
 %define		mod_name	gpib
 
+%define		_rel	0.1
 Summary:	GPIB Linux Support
 Summary(pl):	Sterowniki GPIB dkla Linuksa
 Name:		linux-gpib
 Version:	3.2.05
-%define		_rel	0.1
 Release:	%{_rel}
 License:	GPL
 Group:		Applications/System
@@ -41,14 +41,14 @@ Pakiet Linux GPIB s³u¿y do obs³ugi sprzêtu GPIB (IEEE 488).
 # kernel subpackages.
 
 %package -n kernel-%{mod_name}
-Summary:        Linux driver for %{name}
-Summary(pl):    Sterownik dla Linuksa do %{name}
-Release:        %{_rel}@%{_kernel_ver_str}
-Group:          Base/Kernel
-Requires(post,postun):  /sbin/depmod
+Summary:	Linux driver for %{name}
+Summary(pl):	Sterownik dla Linuksa do %{name}
+Release:	%{_rel}@%{_kernel_ver_str}
+Group:		Base/Kernel
+Requires(post,postun):	/sbin/depmod
 %if %{with dist_kernel}
 %requires_releq_kernel_up
-Requires(postun):       %releq_kernel_up
+Requires(postun):	%releq_kernel_up
 %endif
 
 %description -n kernel-%{mod_name}
@@ -62,14 +62,14 @@ Sterownik dla Linuksa do %{name}.
 Ten pakiet zawiera modu³ j±dra Linuksa.
 
 %package -n kernel-smp-%{mod_name}
-Summary:        Linux SMP driver for %{name}
-Summary(pl):    Sterownik dla Linuksa SMP do %{name}
-Release:        %{_rel}@%{_kernel_ver_str}
-Group:          Base/Kernel
-Requires(post,postun):  /sbin/depmod
+Summary:	Linux SMP driver for %{name}
+Summary(pl):	Sterownik dla Linuksa SMP do %{name}
+Release:	%{_rel}@%{_kernel_ver_str}
+Group:		Base/Kernel
+Requires(post,postun):	/sbin/depmod
 %if %{with dist_kernel}
 %requires_releq_kernel_smp
-Requires(postun):       %releq_kernel_smp
+Requires(postun):	%releq_kernel_smp
 %endif
 
 %description -n kernel-smp-%{mod_name}
@@ -134,7 +134,7 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 		CC="%{__cc}" CPP="%{__cpp}" \
 		M=$PWD O=$PWD \
 		%{?with_verbose:V=1}
-		
+
 	if [ "$i" == "sys" ]; then
 	    i=gpib_common
 	fi
@@ -147,12 +147,12 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 	if [ "$i" == "pc2" ]; then
 	    i=pc2_gpib
 	fi
-	
+
 	mv $i{,-$cfg}.ko
 done
 cd ..
 done
-%endif 
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -191,7 +191,7 @@ install $i-%{?with_dist_kernel:up}%{!?with_dist_kernel:nondist}.ko \
 %if %{with smp} && %{with dist_kernel}
 install $i-smp.ko \
 	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/$i.ko
-cd ..	
+cd ..
 done
 %endif
 %endif
@@ -213,7 +213,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %if %{with kernel}
 %files -n kernel-%{mod_name}
-#%defattr(644,root,root,755)
+%defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/misc/*.ko*
 
 %if %{with smp} && %{with dist_kernel}

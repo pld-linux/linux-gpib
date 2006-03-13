@@ -21,13 +21,14 @@ License:	GPL
 Group:		Applications/System
 Source0:	http://dl.sourceforge.net/linux-gpib/%{name}-%{version}.tar.gz
 # Source0-md5:	65044161fe86a815c9c159fe301d85c4
-Patch0:		%{name}-Makefile.am.patch
+#Patch0:		%{name}-Makefile.am.patch
 URL:		http://linux-gpib.sourceforge.net/
 %if %{with kernel}
 %{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.7}
 BuildRequires:	rpmbuild(macros) >= 1.153
 %endif
 BuildRequires:	kernel-headers >= 2.6.8
+BuildRequires:	python
 Requires(pre,post):	kernel >= 2.6.8
 Requires:	kernel-up >= 2.6.8
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -84,7 +85,7 @@ Ten pakiet zawiera modu³ j±dra Linuksa SMP.
 
 %prep
 %setup -q
-%patch0 -p1
+#patch0 -p1
 
 %build
 %{__aclocal} -I m4
@@ -106,7 +107,8 @@ Ten pakiet zawiera modu³ j±dra Linuksa SMP.
 
 %if %{with kernel}
 cd driver
-for i in agilent_82350b agilent_82357a cb7210 hp82335 hp_82341 nec7210 tms9914 tnt4882 cec ines pc2 sys; do
+for i in tms9914 agilent_82350b agilent_82357a cb7210 hp82335 hp_82341 nec7210 tnt4882 cec ines pc2 sys ; do
+
 cd $i
 # kernel module(s)
 for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}; do

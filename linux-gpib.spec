@@ -13,7 +13,7 @@
 
 %define		_rel	0.1
 Summary:	GPIB Linux Support
-Summary(pl):	Sterowniki GPIB dkla Linuksa
+Summary(pl):	Sterowniki GPIB dla Linuksa
 Name:		linux-gpib
 Version:	3.2.05
 Release:	%{_rel}

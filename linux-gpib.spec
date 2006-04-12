@@ -24,7 +24,7 @@ Source0:	http://dl.sourceforge.net/linux-gpib/%{name}-%{version}.tar.gz
 #Patch0:		%{name}-Makefile.am.patch
 URL:		http://linux-gpib.sourceforge.net/
 %if %{with kernel}
-%{?with_dist_kernel:BuildRequires:	kernel-module-build >= 2.6.7}
+%{?with_dist_kernel:BuildRequires:	kernel-module-build >= 3:2.6.7}
 BuildRequires:	rpmbuild(macros) >= 1.153
 %endif
 BuildRequires:	kernel-headers >= 2.6.8
@@ -137,17 +137,17 @@ for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}
 		M=$PWD O=$PWD \
 		%{?with_verbose:V=1}
 
-	if [ "$i" == "sys" ]; then
-	    i=gpib_common
+	if [ "$i" = "sys" ]; then
+		i=gpib_common
 	fi
-	if [ "$i" == "cec" ]; then
-	    i=cec_gpib
+	if [ "$i" = "cec" ]; then
+		i=cec_gpib
 	fi
-	if [ "$i" == "ines" ]; then
-	    i=ines_gpib
+	if [ "$i" = "ines" ]; then
+		i=ines_gpib
 	fi
-	if [ "$i" == "pc2" ]; then
-	    i=pc2_gpib
+	if [ "$i" = "pc2" ]; then
+		i=pc2_gpib
 	fi
 
 	mv $i{,-$cfg}.ko

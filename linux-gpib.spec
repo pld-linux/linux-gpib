@@ -13,7 +13,7 @@
 
 %define		_rel	0.1
 Summary:	GPIB Linux Support
-Summary(pl):	Sterowniki GPIB dla Linuksa
+Summary(pl.UTF-8):   Sterowniki GPIB dla Linuksa
 Name:		linux-gpib
 Version:	3.2.05
 Release:	%{_rel}
@@ -36,14 +36,14 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %description
 The Linux GPIB package provides support for GPIB (IEEE 488) hardware.
 
-%description -l pl
-Pakiet Linux GPIB s≥uøy do obs≥ugi sprzÍtu GPIB (IEEE 488).
+%description -l pl.UTF-8
+Pakiet Linux GPIB s≈Çu≈ºy do obs≈Çugi sprzƒôtu GPIB (IEEE 488).
 
 # kernel subpackages.
 
 %package -n kernel-%{mod_name}
 Summary:	Linux driver for %{name}
-Summary(pl):	Sterownik dla Linuksa do %{name}
+Summary(pl.UTF-8):   Sterownik dla Linuksa do %{name}
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
@@ -57,14 +57,14 @@ This is driver for %{name} for Linux.
 
 This package contains Linux module.
 
-%description -n kernel-%{mod_name} -l pl
+%description -n kernel-%{mod_name} -l pl.UTF-8
 Sterownik dla Linuksa do %{name}.
 
-Ten pakiet zawiera modu≥ j±dra Linuksa.
+Ten pakiet zawiera modu≈Ç jƒÖdra Linuksa.
 
 %package -n kernel-smp-%{mod_name}
 Summary:	Linux SMP driver for %{name}
-Summary(pl):	Sterownik dla Linuksa SMP do %{name}
+Summary(pl.UTF-8):   Sterownik dla Linuksa SMP do %{name}
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
@@ -78,10 +78,10 @@ This is driver for %{name} for Linux.
 
 This package contains Linux SMP module.
 
-%description -n kernel-smp-%{mod_name} -l pl
+%description -n kernel-smp-%{mod_name} -l pl.UTF-8
 Sterownik dla Linuksa do %{name}.
 
-Ten pakiet zawiera modu≥ j±dra Linuksa SMP.
+Ten pakiet zawiera modu≈Ç jƒÖdra Linuksa SMP.
 
 %prep
 %setup -q

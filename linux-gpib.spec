@@ -13,7 +13,7 @@
 
 %define		_rel	0.1
 Summary:	GPIB Linux Support
-Summary(pl.UTF-8):   Sterowniki GPIB dla Linuksa
+Summary(pl.UTF-8):	Sterowniki GPIB dla Linuksa
 Name:		linux-gpib
 Version:	3.2.05
 Release:	%{_rel}
@@ -43,7 +43,7 @@ Pakiet Linux GPIB służy do obsługi sprzętu GPIB (IEEE 488).
 
 %package -n kernel-%{mod_name}
 Summary:	Linux driver for %{name}
-Summary(pl.UTF-8):   Sterownik dla Linuksa do %{name}
+Summary(pl.UTF-8):	Sterownik dla Linuksa do %{name}
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod
@@ -64,7 +64,7 @@ Ten pakiet zawiera moduł jądra Linuksa.
 
 %package -n kernel-smp-%{mod_name}
 Summary:	Linux SMP driver for %{name}
-Summary(pl.UTF-8):   Sterownik dla Linuksa SMP do %{name}
+Summary(pl.UTF-8):	Sterownik dla Linuksa SMP do %{name}
 Release:	%{_rel}@%{_kernel_ver_str}
 Group:		Base/Kernel
 Requires(post,postun):	/sbin/depmod

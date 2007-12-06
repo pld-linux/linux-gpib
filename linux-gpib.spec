@@ -2,8 +2,6 @@
 # Conditional build:
 %bcond_without	dist_kernel	# allow non-distribution kernel
 %bcond_without	kernel		# don't build kernel modules
-%bcond_without	up		# don't build UP module
-%bcond_without	smp		# don't build SMP module
 %bcond_without	userspace	# don't build userspace module
 %bcond_with	verbose		# verbose build (V=1)
 #
@@ -16,13 +14,13 @@
 Summary:	GPIB Linux Support
 Summary(pl.UTF-8):	Sterowniki GPIB dla Linuksa
 Name:		linux-gpib
-Version:	3.2.05
+Version:	3.2.09
 Release:	%{_rel}
 License:	GPL
 Group:		Applications/System
 Source0:	http://dl.sourceforge.net/linux-gpib/%{name}-%{version}.tar.gz
-# Source0-md5:	65044161fe86a815c9c159fe301d85c4
-#Patch0:		%{name}-Makefile.am.patch
+# Source0-md5:	06636539e335ad126f7893db50368142
+Patch0:		%{name}-include_file.patch
 URL:		http://linux-gpib.sourceforge.net/
 %if %{with kernel}
 %{?with_dist_kernel:BuildRequires:	kernel-module-build >= 3:2.6.7}
@@ -63,32 +61,19 @@ Sterownik dla Linuksa do %{name}.
 
 Ten pakiet zawiera moduł jądra Linuksa.
 
-%package -n kernel-smp-%{mod_name}
-Summary:	Linux SMP driver for %{name}
-Summary(pl.UTF-8):	Sterownik dla Linuksa SMP do %{name}
-Release:	%{_rel}@%{_kernel_ver_str}
-Group:		Base/Kernel
-Requires(post,postun):	/sbin/depmod
-%if %{with dist_kernel}
-%requires_releq_kernel_smp
-Requires(postun):	%releq_kernel_smp
-%endif
-
-%description -n kernel-smp-%{mod_name}
-This is driver for %{name} for Linux.
-
-This package contains Linux SMP module.
-
-%description -n kernel-smp-%{mod_name} -l pl.UTF-8
-Sterownik dla Linuksa do %{name}.
-
-Ten pakiet zawiera moduł jądra Linuksa SMP.
-
 %prep
 %setup -q
-#patch0 -p1
+%patch0 -p1
 
 %build
+%if %{with kernel}
+%{__}
+TOPDIR="`pwd`/drivers/gpib"
+%build_kernel_modules -C drivers/gpib -m gpib_common,cec_gpib,ines_gpib,pc2_gpib \
+	CFLAGS="%{rpmcflags} -I$TOPDIR/include -I$TOPDIR/o/include/asm/mach-default"
+%endif
+
+%if %{with userspace}
 %{__aclocal} -I m4
 %{__libtoolize}
 %{__autoconf}
@@ -102,67 +87,19 @@ Ten pakiet zawiera moduł jądra Linuksa SMP.
 	--disable-tcl-binding \
 	--disable-documentation
 
-%if %{with userspace}
 %{__make}
 %endif
 
-%if %{with kernel}
-cd driver
-for i in tms9914 agilent_82350b agilent_82357a cb7210 hp82335 hp_82341 nec7210 tnt4882 cec ines pc2 sys ; do
-
-cd $i
-# kernel module(s)
-for cfg in %{?with_dist_kernel:%{?with_smp:smp} up}%{!?with_dist_kernel:nondist}; do
-	if [ ! -r "%{_kernelsrcdir}/config-$cfg" ]; then
-		exit 1
-	fi
-	rm -rf include
-	install -d include/{linux,config}
-	ln -sf %{_kernelsrcdir}/config-$cfg .config
-	ln -sf %{_kernelsrcdir}/include/linux/autoconf-$cfg.h include/linux/autoconf.h
-	ln -sf %{_kernelsrcdir}/include/asm-%{_target_base_arch} include/asm
-	ln -sf %{_kernelsrcdir}/Module.symvers-$cfg Module.symvers
-	touch include/config/MARKER
-
-	cp -rdp ../include/* include
-	install -d include/gpib
-	cp -rdp include/gpib_user.h include/gpib
-	cp -rdp ../../config.h include
-
-	%{__make} -C %{_kernelsrcdir} clean \
-		RCS_FIND_IGNORE="-name '*.ko' -o" \
-		M=$PWD O=$PWD \
-		%{?with_verbose:V=1}
-	%{__make} -C %{_kernelsrcdir} modules \
-		CC="%{__cc}" CPP="%{__cpp}" \
-		M=$PWD O=$PWD \
-		%{?with_verbose:V=1}
-
-	if [ "$i" = "sys" ]; then
-		i=gpib_common
-	fi
-	if [ "$i" = "cec" ]; then
-		i=cec_gpib
-	fi
-	if [ "$i" = "ines" ]; then
-		i=ines_gpib
-	fi
-	if [ "$i" = "pc2" ]; then
-		i=pc2_gpib
-	fi
-
-	mv $i{,-$cfg}.ko
-done
-cd ..
-done
-%endif
+#for i in tms9914 agilent_82350b agilent_82357a cb7210 hp82335 hp_82341 nec7210 tnt4882 cec ines pc2 sys ; do
 
 %install
 rm -rf $RPM_BUILD_ROOT
-HOTPLUG_USB_CONF_DIR=/etc/hotplug/usb
-USB_FIRMWARE_DIR=/usr/share/usb/
 
-install -d $RPM_BUILD_ROOT{$HOTPLUG_USB_CONF_DIR,$USB_FIRMWARE_DIR}
+%if %{with kernel}
+%install_kernel_modules -d misc -m gpib_common,cec_gpib,ines_gpib,pc2_gpib
+#for i in agilent_82350b agilent_82357a cb7210 hp82335 hp_82341 nec7210 tms9914 tnt4882 cec ines pc2 sys; do
+%endif
+
 %if %{with userspace}
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT \
@@ -170,60 +107,17 @@ install -d $RPM_BUILD_ROOT{$HOTPLUG_USB_CONF_DIR,$USB_FIRMWARE_DIR}
 	USB_FIRMWARE_DIR=$RPM_BUILD_ROOT$USB_FIRMWARE_DIR
 %endif
 
-%if %{with kernel}
-install -d $RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}{,smp}/misc
-
-cd driver
-for i in agilent_82350b agilent_82357a cb7210 hp82335 hp_82341 nec7210 tms9914 tnt4882 cec ines pc2 sys; do
-cd $i
-	if [ "$i" == "sys" ]; then
-	    i=gpib_common
-	fi
-	if [ "$i" == "cec" ]; then
-	    i=cec_gpib
-	fi
-	if [ "$i" == "ines" ]; then
-	    i=ines_gpib
-	fi
-	if [ "$i" == "pc2" ]; then
-	    i=pc2_gpib
-	fi
-
-install $i-%{?with_dist_kernel:up}%{!?with_dist_kernel:nondist}.ko \
-	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}/misc/$i.ko
-%if %{with smp} && %{with dist_kernel}
-install $i-smp.ko \
-	$RPM_BUILD_ROOT/lib/modules/%{_kernel_ver}smp/misc/$i.ko
-cd ..
-done
-%endif
-%endif
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post -n kernel-%{mod_name}
+%post -n kernel%{_alt_kernel}-%{mod_name}
 %depmod %{_kernel_ver}
 
-%postun -n kernel-%{mod_name}
+%postun -n kernel%{_alt_kernel}-%{mod_name}
 %depmod %{_kernel_ver}
-
-%post	-n kernel-smp-%{mod_name}
-%depmod %{_kernel_ver}smp
-
-%postun	-n kernel-smp-%{mod_name}
-%depmod %{_kernel_ver}smp
 
 %if %{with kernel}
-%if %{with up} || %{without dist_kernel}
-%files -n kernel-%{mod_name}
+%files -n kernel%{_alt_kernel}-%{mod_name}
 %defattr(644,root,root,755)
 /lib/modules/%{_kernel_ver}/misc/*.ko*
-%endif
-
-%if %{with smp} && %{with dist_kernel}
-%files -n kernel-smp-%{mod_name}
-%defattr(644,root,root,755)
-/lib/modules/%{_kernel_ver}smp/misc/*.ko*
-%endif
 %endif

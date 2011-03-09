@@ -6,9 +6,9 @@
   */
 -#include "gpib/gpib_user.h"
 +#include "gpib_user.h"
- #include <linux/wait.h>
- #include <linux/timer.h>
- #include <linux/interrupt.h>
+ #include <linux/mutex.h>
+ #include <linux/wite.h>
+ #include <linux/sched.h>
 --- linux-gpib-3.2.09/drivers/gpib/include/gpibP.h.orig	2007-12-06 00:42:20.000000000 +0000
 +++ linux-gpib-3.2.09/drivers/gpib/include/gpibP.h	2007-12-06 00:47:22.000000000 +0000
 @@ -20,7 +20,7 @@

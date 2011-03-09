@@ -14,12 +14,12 @@
 Summary:	GPIB Linux Support
 Summary(pl.UTF-8):	Sterowniki GPIB dla Linuksa
 Name:		linux-gpib
-Version:	3.2.09
+Version:	3.2.15
 Release:	%{_rel}
 License:	GPL
 Group:		Applications/System
 Source0:	http://dl.sourceforge.net/linux-gpib/%{name}-%{version}.tar.gz
-# Source0-md5:	06636539e335ad126f7893db50368142
+# Source0-md5:	cc90a7d6738953230bd24a18188ac2f5
 Patch0:		%{name}-include_file.patch
 URL:		http://linux-gpib.sourceforge.net/
 %if %{with kernel}

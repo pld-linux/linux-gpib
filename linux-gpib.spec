@@ -4,6 +4,15 @@
 %bcond_without	kernel		# don't build kernel modules
 %bcond_without	userspace	# don't build userspace module
 %bcond_with	verbose		# verbose build (V=1)
+
+%bcond_without	guile		#
+%bcond_without	perl
+%bcond_without	php
+%bcond_without	python
+%bcond_without	tcl
+
+%bcond_without docs
+
 #
 # main package.
 #
@@ -28,6 +37,12 @@ BuildRequires:	rpmbuild(macros) >= 1.153
 %endif
 BuildRequires:	kernel-headers >= 2.6.8
 BuildRequires:	python
+%{?with_guile:BuildRequires:	guile-devel}
+%{?with_perl:BuildRequires:	perl-devel}
+%{?with_php:BuildRequires:	php-devel}
+%{?with_python:BuildRequires:	python-devel}
+%{?with_tcl:BuildRequires:	tcl-devel}
+
 Requires(pre,post):	kernel >= 2.6.8
 Requires:	kernel-up >= 2.6.8
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -59,21 +74,21 @@ This package contains Linux module.
 %description -n kernel-%{mod_name} -l pl.UTF-8
 Sterownik dla Linuksa do %{name}.
 
-Ten pakiet zawiera moduł jądra Linuksa.
+Ten pakiet zawiera moduł jadra
 
 %prep
 %setup -q
 %patch0 -p1
 
 %build
-%if %{with kernel}
-%{__}
-TOPDIR="`pwd`/drivers/gpib"
-%build_kernel_modules -C drivers/gpib -m gpib_common,cec_gpib,ines_gpib,pc2_gpib \
-	CFLAGS="%{rpmcflags} -I$TOPDIR/include -I$TOPDIR/o/include/asm/mach-default"
-%endif
+##%if %{with kernel}
+##%{__}
+##TOPDIR="`pwd`/drivers/gpib"
+##%build_kernel_modules -C drivers/gpib -m gpib_common,cec_gpib,ines_gpib,pc2_gpib \
+##	CFLAGS="%{rpmcflags} -I$TOPDIR/include -I$TOPDIR/o/include/asm/mach-default"
+##%endif
 
-%if %{with userspace}
+##%if %{with userspace}
 %{__aclocal} -I m4
 %{__libtoolize}
 %{__autoconf}
@@ -88,7 +103,7 @@ TOPDIR="`pwd`/drivers/gpib"
 	--disable-documentation
 
 %{__make}
-%endif
+##%endif
 
 #for i in tms9914 agilent_82350b agilent_82357a cb7210 hp82335 hp_82341 nec7210 tnt4882 cec ines pc2 sys ; do
 

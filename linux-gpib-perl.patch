@@ -1,0 +1,8 @@
+--- linux-gpib-4.0.3/language/Makefile.am.orig	2016-04-09 15:33:09.000000000 +0200
++++ linux-gpib-4.0.3/language/Makefile.am	2016-07-05 15:42:10.671996823 +0200
+@@ -67,4 +67,4 @@
+ 	$(RM) perl/Makefile
+ 
+ perl/Makefile:
+-	-(cd perl && $(PERL) Makefile.PL)
++	-(cd perl && $(PERL) Makefile.PL INSTALLDIRS=vendor CC="$(CC)" OPTIMIZE="$(CFLAGS)")

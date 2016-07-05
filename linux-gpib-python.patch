@@ -1,0 +1,11 @@
+--- linux-gpib-4.0.3/language/python/Makefile.am.orig	2016-04-09 15:33:09.000000000 +0200
++++ linux-gpib-4.0.3/language/python/Makefile.am	2016-07-05 15:18:01.336515214 +0200
+@@ -15,7 +15,7 @@
+ 	-{ $(PYTHON) setup.py build && touch build; } || { $(RM) -r build; exit 1; }
+ 
+ install-data-local:
+-	-$(PYTHON) setup.py install --prefix=$(DESTDIR)$(prefix)
++	-$(PYTHON) setup.py install --optimize=2 --prefix=$(prefix) --root=$(DESTDIR)
+ 
+ clean-local:
+ 	-$(RM) -r build

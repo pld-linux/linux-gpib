@@ -1,5 +1,5 @@
 # TODO:
-# - resolve udev vs hotplug issues (use /lib/udev/rules.d, don't require /etc/hotplug dir with udev)
+# - where to get firmware from?
 # - guile 2 support
 # - PHP 7 support
 #
@@ -9,6 +9,7 @@
 %bcond_without	verbose		# verbose modules build (V=1)
 
 %bcond_without	docs		# documentation build
+%bcond_with	hotplug		# legacy hotplug support
 %bcond_without	static_libs	# static library
 %bcond_with	guile		# guile binding
 %bcond_without	perl		# Perl binding
@@ -30,6 +31,7 @@ Patch0:		%{name}-include_file.patch
 Patch1:		%{name}-destdir.patch
 Patch2:		%{name}-python.patch
 Patch3:		%{name}-perl.patch
+Patch4:		%{name}-firmwaredir.patch
 URL:		http://linux-gpib.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -57,6 +59,19 @@ The Linux GPIB package provides support for GPIB (IEEE 488) hardware.
 
 %description -l pl.UTF-8
 Pakiet Linux GPIB służy do obsługi sprzętu GPIB (IEEE 488).
+
+%package hotplug
+Summary:	Linux GPIB support for legacy USB hotplug
+Summary(pl.UTF-8):	Obsługa Linux GPIB dla starego systemu hotplug USB
+Group:		Applications/System
+Requires:	%{name} = %{version}-%{release}
+Requires:	hotplug
+
+%description hotplug
+Linux GPIB support for legacy USB hotplug.
+
+%description hotplug -l pl.UTF-8
+Obsługa Linux GPIB dla starego systemu hotplug USB.
 
 %package libs
 Summary:	Shared GPIB library
@@ -190,6 +205,7 @@ cd drivers/gpib\
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 # disable modules build by default, just install userspace header
 echo 'SUBDIRS = gpib/include' > drivers/Makefile.am
@@ -238,7 +254,15 @@ cp -a drivers/gpib/installed/* $RPM_BUILD_ROOT
 
 %if %{with userspace}
 %{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT
+	DESTDIR=$RPM_BUILD_ROOT \
+	HOTPLUG_USB_CONF_DIR=/lib/udev \
+	UDEV_RULES_DIR=/lib/udev/rules.d \
+	USB_FIRMWARE_DIR=/lib/firmware
+# use udev paths as base and legacy hotplug as addon (not the opposite)
+install -d $RPM_BUILD_ROOT/etc/hotplug/usb
+%{__mv} $RPM_BUILD_ROOT/lib/udev/*.usermap $RPM_BUILD_ROOT/etc/hotplug/usb
+ln -snf /lib/udev/agilent_82357a $RPM_BUILD_ROOT/etc/hotplug/usb/agilent_82357a
+ln -snf /lib/udev/ni_usb_gpib $RPM_BUILD_ROOT/etc/hotplug/usb/ni_usb_gpib
 
 # obsoleted by pkg-config
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/libgpib.la
@@ -280,18 +304,28 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/ibterm
 %attr(755,root,root) %{_bindir}/ibtest
 %attr(755,root,root) %{_sbindir}/gpib_config
-# TODO: move to /lib/udev/rules.d
-/etc/udev/rules.d/99-agilent_82357a.rules
-/etc/udev/rules.d/99-gpib-generic.rules
-/etc/udev/rules.d/99-ni_usb_gpib.rules
-# TODO: paths to fix (scripts used also in udev .rules)
+/lib/udev/rules.d/99-agilent_82357a.rules
+/lib/udev/rules.d/99-gpib-generic.rules
+/lib/udev/rules.d/99-ni_usb_gpib.rules
+%attr(755,root,root) /lib/udev/agilent_82357a
+%attr(755,root,root) /lib/udev/ni_usb_gpib
+%dir /lib/firmware/agilent_82357a
+# TODO:
+#/lib/firmware/agilent_82357a/82357a_fw.hex
+#/lib/firmware/agilent_82357a/measat_releaseX1.8.hex
+%dir /lib/firmware/ni_usb_gpib
+# TODO:
+#/lib/firmware/ni_usb_gpib/niusbb_firmware.hex
+#/lib/firmware/ni_usb_gpib/niusbb_loader.hex
+
+%if %{with hotplug}
+%files hotplug
+%defattr(644,root,root,755)
 %attr(755,root,root) /etc/hotplug/usb/agilent_82357a
 %attr(755,root,root) /etc/hotplug/usb/ni_usb_gpib
 /etc/hotplug/usb/agilent_82357a.usermap
 /etc/hotplug/usb/ni_usb_gpib.usermap
-# /lib/firmware/...; and where are the files?
-%dir %{_datadir}/usb/agilent_82357a
-%dir %{_datadir}/usb/ni_usb_gpib
+%endif
 
 %files libs
 %defattr(644,root,root,755)

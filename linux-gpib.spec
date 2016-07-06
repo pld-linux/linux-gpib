@@ -1,6 +1,5 @@
 # TODO:
 # - where to get firmware from?
-# - guile 2 support
 # - PHP 7 support
 #
 # Conditional build:
@@ -11,7 +10,7 @@
 %bcond_without	docs		# documentation build
 %bcond_with	hotplug		# legacy hotplug support
 %bcond_without	static_libs	# static library
-%bcond_with	guile		# guile binding
+%bcond_without	guile		# guile binding
 %bcond_without	perl		# Perl binding
 %bcond_without	php		# PHP binding
 %bcond_without	python		# Python binding
@@ -32,6 +31,7 @@ Patch1:		%{name}-destdir.patch
 Patch2:		%{name}-python.patch
 Patch3:		%{name}-perl.patch
 Patch4:		%{name}-firmwaredir.patch
+Patch5:		%{name}-guile2.patch
 URL:		http://linux-gpib.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -44,7 +44,7 @@ BuildRequires:	kernel-module-build >= 3:2.6.8
 BuildRequires:	bison
 %{?with_docs:BuildRequires:	docbook-utils}
 BuildRequires:	flex
-%{?with_guile:BuildRequires:	guile-devel < 5:2.0}
+%{?with_guile:BuildRequires:	guile-devel >= 1.4}
 %{?with_perl:BuildRequires:	perl-devel}
 %{?with_php:BuildRequires:	php-devel < 4:7}
 %{?with_python:BuildRequires:	python-devel >= 2}
@@ -107,6 +107,19 @@ Static GPIB library.
 
 %description static -l pl.UTF-8
 Biblioteka statyczna GPIB.
+
+%package -n guile-gpib
+Summary:	Guile bindings for GPIB library
+Summary(pl.UTF-8):	Wiązania Guile do biblioteki GPIB
+Group:		Development/Languages/Perl
+Requires:	%{name}-libs = %{version}-%{release}
+Requires:	guile-libs
+
+%description -n guile-gpib
+Guile bindings for GPIB library.
+
+%description -n guile-gpib -l pl.UTF-8
+Wiązania Guile do biblioteki GPIB.
 
 %package -n perl-gpib
 Summary:	Perl bindings for GPIB library
@@ -206,6 +219,7 @@ cd drivers/gpib\
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 # disable modules build by default, just install userspace header
 echo 'SUBDIRS = gpib/include' > drivers/Makefile.am
@@ -221,6 +235,9 @@ done
 %{__autoconf}
 %{__autoheader}
 %{__automake}
+%if %{with guile}
+CPPFLAGS="%{rpmcppflags} -I/usr/include/guile/2.0"
+%endif
 %configure \
 %ifarch %{ix86}
 	--enable-isa \
@@ -267,6 +284,13 @@ ln -snf /lib/udev/ni_usb_gpib $RPM_BUILD_ROOT/etc/hotplug/usb/ni_usb_gpib
 # obsoleted by pkg-config
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/libgpib.la
 
+%if %{with guile}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libgpib-guile.la
+%if %{with static_libs}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libgpib-guile.a
+%endif
+%endif
+
 %if %{with perl}
 %{__make} -C language/perl pure_install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -297,6 +321,12 @@ rm -rf $RPM_BUILD_ROOT
 
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
+
+%post	-n guile-gpib -p /sbin/ldconfig
+%postun	-n guile-gpib -p /sbin/ldconfig
+
+%post	-n tcl-gpib -p /sbin/ldconfig
+%postun	-n tcl-gpib -p /sbin/ldconfig
 
 %if %{with userspace}
 %files
@@ -343,6 +373,13 @@ rm -rf $RPM_BUILD_ROOT
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/libgpib.a
+%endif
+
+%if %{with guile}
+%files -n guile-gpib
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libgpib-guile-%{version}.so
+%attr(755,root,root) %{_libdir}/libgpib-guile.so
 %endif
 
 %if %{with perl}

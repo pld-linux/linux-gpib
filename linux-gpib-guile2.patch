@@ -1,0 +1,43 @@
+--- linux-gpib-4.0.3/configure.ac.orig	2016-04-09 15:34:55.000000000 +0200
++++ linux-gpib-4.0.3/configure.ac	2016-07-06 17:55:18.567320365 +0200
+@@ -143,8 +143,10 @@
+ fi
+ 
+ dnl Checks for libraries.
++AC_CHECK_LIB([guile-2.0],[scm_c_define],[:],[
+ AC_CHECK_LIB([guile],[gh_define],[echo this prevents default actions from occurring > /dev/null],
+ 	[BIND_GUILE="no";AC_MSG_NOTICE([libguile not found, disabling guile binding])],[])
++])
+ 
+ AC_CHECK_LIB([readline], [readline], 
+   	     [readline_lib=yes;AC_SUBST([LIB_READLINE_LDFLAGS], ["-lreadline -lncurses"])],
+--- linux-gpib-4.0.3/language/guile/gpib.h.orig	2016-04-09 15:33:09.000000000 +0200
++++ linux-gpib-4.0.3/language/guile/gpib.h	2016-07-06 20:44:07.355781339 +0200
+@@ -22,12 +22,12 @@
+ #ifndef SCM_GPIB_H
+ #define SCM_GPIB_H 1
+ 
+-#if defined (SCM_MINOR_VERSION) && (SCM_MINOR_VERSION >= 5) && \
+-    defined (SCM_MAJOR_VERSION) && (SCM_MAJOR_VERSION >= 1)
++#if defined (SCM_MAJOR_VERSION) && ((SCM_MAJOR_VERSION > 1) || ((SCM_MAJOR_VERSION == 1) && \
++    defined (SCM_MINOR_VERSION) && (SCM_MINOR_VERSION >= 5)))
+ #define SCM_VERSION_15X 1
+ #endif
+-#if defined (SCM_MINOR_VERSION) && (SCM_MINOR_VERSION >= 7) && \
+-    defined (SCM_MAJOR_VERSION) && (SCM_MAJOR_VERSION >= 1)
++#if defined (SCM_MAJOR_VERSION) && ((SCM_MAJOR_VERSION > 1) || ((SCM_MAJOR_VERSION == 1) && \
++    defined (SCM_MINOR_VERSION) && (SCM_MINOR_VERSION >= 7)))
+ #define SCM_VERSION_17X 1
+ #endif
+ 
+--- linux-gpib-4.0.3/language/guile/gpib.c.orig	2016-04-09 15:33:09.000000000 +0200
++++ linux-gpib-4.0.3/language/guile/gpib.c	2016-07-06 18:07:48.129926301 +0200
+@@ -23,7 +23,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-#include <guile/gh.h>
++#include <libguile.h>
+ #include <gpib/ib.h>
+ 
+ #include "gpib.h"

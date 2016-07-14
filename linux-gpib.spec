@@ -1,6 +1,5 @@
 # TODO:
 # - where to get firmware from?
-# - PHP 7 support
 #
 # Conditional build:
 %bcond_without	kernel		# kernel modules
@@ -16,6 +15,8 @@
 %bcond_without	python		# Python binding
 %bcond_without	tcl		# Tcl binding
 
+%include	/usr/lib/rpm/macros.perl
+%define		php_name	php%{?php_suffix}
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
 Name:		linux-gpib
@@ -32,6 +33,7 @@ Patch2:		%{name}-python.patch
 Patch3:		%{name}-perl.patch
 Patch4:		%{name}-firmwaredir.patch
 Patch5:		%{name}-guile2.patch
+Patch6:		%{name}-php7.patch
 URL:		http://linux-gpib.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -46,7 +48,7 @@ BuildRequires:	bison
 BuildRequires:	flex
 %{?with_guile:BuildRequires:	guile-devel >= 1.4}
 %{?with_perl:BuildRequires:	perl-devel}
-%{?with_php:BuildRequires:	php-devel < 4:7}
+%{?with_php:BuildRequires:	%{php_name}-devel >= 3:5}
 %{?with_python:BuildRequires:	python-devel >= 2}
 BuildRequires:	readline-devel
 %{?with_tcl:BuildRequires:	tcl-devel}
@@ -132,6 +134,20 @@ Perl bindings for GPIB library.
 
 %description -n perl-gpib -l pl.UTF-8
 Wiązania Perla do biblioteki GPIB.
+
+%package -n %{php_name}-gpib
+Summary:	PHP bindings for GPIB library
+Summary(pl.UTF-8):	Wiązania PHP do biblioteki GPIB
+Group:		Development/Languages/PHP
+Provides:	php(gpib) = %{version}
+Requires:	%{name}-libs = %{version}-%{release}
+%{?requires_php_extension}
+
+%description -n %{php_name}-gpib
+PHP bindings for GPIB library.
+
+%description -n %{php_name}-gpib -l pl.UTF-8
+Wiązania PHP do biblioteki GPIB.
 
 %package -n python-gpib
 Summary:	Python bindings for GPIB library
@@ -220,6 +236,7 @@ cd drivers/gpib\
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 # disable modules build by default, just install userspace header
 echo 'SUBDIRS = gpib/include' > drivers/Makefile.am
@@ -294,8 +311,23 @@ ln -snf /lib/udev/ni_usb_gpib $RPM_BUILD_ROOT/etc/hotplug/usb/ni_usb_gpib
 %if %{with perl}
 %{__make} -C language/perl pure_install \
 	DESTDIR=$RPM_BUILD_ROOT
+
 cp -pr language/perl/examples $RPM_BUILD_ROOT%{_examplesdir}/perl-gpib-%{version}
+
 %{__rm} -f $RPM_BUILD_ROOT%{perl_vendorarch}/auto/LinuxGpib/.packlist
+%endif
+
+%if %{with php}
+install -d $RPM_BUILD_ROOT%{php_sysconfdir}/conf.d
+cat <<'EOF' > $RPM_BUILD_ROOT%{php_sysconfdir}/conf.d/gpib.ini
+; Enable gpib extension module
+extension=gpib_php.so
+EOF
+
+%{__rm} $RPM_BUILD_ROOT%{php_extensiondir}/gpib_php.la
+%if %{with static_libs}
+%{__rm} $RPM_BUILD_ROOT%{php_extensiondir}/gpib_php.a
+%endif
 %endif
 
 %if %{with python}
@@ -304,6 +336,7 @@ cp -pr language/perl/examples $RPM_BUILD_ROOT%{_examplesdir}/perl-gpib-%{version
 
 %if %{with tcl}
 cp -pr language/tcl/examples $RPM_BUILD_ROOT%{_examplesdir}/tcl-gpib-%{version}
+
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/libgpib_tcl.la
 %if %{with static_libs}
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/libgpib_tcl.a
@@ -327,6 +360,14 @@ rm -rf $RPM_BUILD_ROOT
 
 %post	-n tcl-gpib -p /sbin/ldconfig
 %postun	-n tcl-gpib -p /sbin/ldconfig
+
+%post	-n %{php_name}-gpib
+%php_webserver_restart
+
+%postun	-n %{php_name}-gpib
+if [ "$1" = 0 ]; then
+	%php_webserver_restart
+fi
 
 %if %{with userspace}
 %files
@@ -392,6 +433,14 @@ rm -rf $RPM_BUILD_ROOT
 %{perl_vendorarch}/auto/LinuxGpib/autosplit.ix
 %{_mandir}/man3/LinuxGpib.3pm*
 %{_examplesdir}/perl-gpib-%{version}
+%endif
+
+%if %{with php}
+%files -n %{php_name}-gpib
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/gpib.ini
+%attr(755,root,root) %{php_extensiondir}/gpib_php-%{version}.so
+%attr(755,root,root) %{php_extensiondir}/gpib_php.so
 %endif
 
 %if %{with python}

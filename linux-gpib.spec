@@ -3,6 +3,9 @@
 #
 # Conditional build:
 %bcond_without	kernel		# kernel modules
+%bcond_without	drivers_isa	# ISA kernel drivers [ix86 only]
+%bcond_without	drivers_pcmcia	# PCMCIA support in kernel drivers
+%bcond_without	drivers_usb	# USB kernel drivers
 %bcond_without	userspace	# userspace packages
 %bcond_without	verbose		# verbose modules build (V=1)
 
@@ -15,6 +18,10 @@
 %bcond_without	python		# Python binding
 %bcond_without	tcl		# Tcl binding
 
+%ifnarch %{ix86}
+%undefine	with_drivers_isa
+%undefine	with_drivers_pcmcia
+%endif
 %include	/usr/lib/rpm/macros.perl
 %define		php_name	php%{?php_suffix}
 Summary:	GPIB (IEEE 488) Linux support
@@ -220,7 +227,7 @@ Ten pakiet zawiera sterowniki dla Linuksa do urządzeń GPIB (IEEE 488).\
 TOPDIR=$(pwd)\
 %build_kernel_modules -C drivers/gpib -m gpib -- EARLYCPPFLAGS="-I$TOPDIR -I$TOPDIR/drivers/gpib/include -I$TOPDIR/include"\
 cd drivers/gpib\
-%install_kernel_modules -D installed -m agilent_82350b/agilent_82350b,agilent_82357a/agilent_82357a,cb7210/cb7210,cec/cec_gpib,hp_82335/hp82335,hp_82341/hp_82341,ines/ines_gpib,lpvo_usb_gpib/lpvo_usb_gpib,nec7210/nec7210,ni_usb/ni_usb_gpib,pc2/pc2_gpib,sys/gpib_common,tms9914/tms9914,tnt4882/tnt4882 -d kernel/gpib\
+%install_kernel_modules -D installed -m agilent_82350b/agilent_82350b,cb7210/cb7210,cec/cec_gpib,hp_82335/hp82335,hp_82341/hp_82341,ines/ines_gpib,nec7210/nec7210,sys/gpib_common,tms9914/tms9914,tnt4882/tnt4882%{?with_drivers_isa:,pc2/pc2_gpib}%{?with_drivers_usb:,agilent_82357a/agilent_82357a,lpvo_usb_gpib/lpvo_usb_gpib,ni_usb/ni_usb_gpib} -d kernel/gpib\
 %{nil}
 
 %define install_kernel_pkg()\
@@ -256,10 +263,8 @@ done
 CPPFLAGS="%{rpmcppflags} -I/usr/include/guile/2.0"
 %endif
 %configure \
-%ifarch %{ix86}
-	--enable-isa \
-	--enable-pcmcia \
-%endif
+	%{?with_drivers_isa:--enable-isa} \
+	%{?with_drivers_pcmcia:--enable-pcmcia} \
 	%{!?with_docs:--disable-documentation} \
 	%{!?with_guile:--disable-guile-binding} \
 	%{!?with_perl:--disable-perl-binding} \
@@ -292,11 +297,16 @@ cp -a drivers/gpib/installed/* $RPM_BUILD_ROOT
 	HOTPLUG_USB_CONF_DIR=/lib/udev \
 	UDEV_RULES_DIR=/lib/udev/rules.d \
 	USB_FIRMWARE_DIR=/lib/firmware
+
+%if %{with hotplug}
 # use udev paths as base and legacy hotplug as addon (not the opposite)
 install -d $RPM_BUILD_ROOT/etc/hotplug/usb
 %{__mv} $RPM_BUILD_ROOT/lib/udev/*.usermap $RPM_BUILD_ROOT/etc/hotplug/usb
 ln -snf /lib/udev/agilent_82357a $RPM_BUILD_ROOT/etc/hotplug/usb/agilent_82357a
 ln -snf /lib/udev/ni_usb_gpib $RPM_BUILD_ROOT/etc/hotplug/usb/ni_usb_gpib
+%else
+%{__rm} $RPM_BUILD_ROOT/lib/udev/*.usermap
+%endif
 
 # obsoleted by pkg-config
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/libgpib.la

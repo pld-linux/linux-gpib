@@ -1,5 +1,3 @@
-# TODO:
-# - where to get firmware from?
 #
 # Conditional build:
 %bcond_without	kernel		# kernel modules
@@ -28,7 +26,7 @@ Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
 Name:		linux-gpib
 Version:	4.0.3
-%define	rel	0.1
+%define	rel	1
 Release:	%{rel}
 License:	GPL v2+
 Group:		Applications/System
@@ -61,6 +59,10 @@ BuildRequires:	readline-devel
 %{?with_tcl:BuildRequires:	tcl-devel}
 %endif
 Requires:	%{name}-libs = %{version}-%{release}
+# for agilent_82357a and ni_usb_gpib
+Suggests:	fxload
+# for agilent_82357a, agilent/hp_82341, agilent/hp_82350a, ni_usb_gpib
+Suggests:	linux-gpib-firmware
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -390,14 +392,6 @@ fi
 /lib/udev/rules.d/99-ni_usb_gpib.rules
 %attr(755,root,root) /lib/udev/agilent_82357a
 %attr(755,root,root) /lib/udev/ni_usb_gpib
-%dir /lib/firmware/agilent_82357a
-# TODO:
-#/lib/firmware/agilent_82357a/82357a_fw.hex
-#/lib/firmware/agilent_82357a/measat_releaseX1.8.hex
-%dir /lib/firmware/ni_usb_gpib
-# TODO:
-#/lib/firmware/ni_usb_gpib/niusbb_firmware.hex
-#/lib/firmware/ni_usb_gpib/niusbb_loader.hex
 
 %if %{with hotplug}
 %files hotplug

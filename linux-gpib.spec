@@ -16,29 +16,41 @@
 %bcond_without	python		# Python binding
 %bcond_without	tcl		# Tcl binding
 
+# The goal here is to have main, userspace, package built once with
+# simple release number, and only rebuild kernel packages with kernel
+# version as part of release number, without the need to bump release
+# with every kernel change.
+%if 0%{?_pld_builder:1} && %{with kernel} && %{with userspace}
+%{error:kernel and userspace cannot be built at the same time on PLD builders}
+exit 1
+%endif
+
 %ifnarch %{ix86}
 %undefine	with_drivers_isa
 %undefine	with_drivers_pcmcia
 %endif
+
 %include	/usr/lib/rpm/macros.perl
 %define		php_name	php%{?php_suffix}
+
+%define		rel	2
+%define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
-Name:		linux-gpib
+Name:		%{pname}%{?_pld_builder:%{?with_kernel:-kernel}}%{_alt_kernel}
 Version:	4.0.3
-%define	rel	1
 Release:	%{rel}
 License:	GPL v2+
 Group:		Applications/System
-Source0:	http://downloads.sourceforge.net/linux-gpib/%{name}-%{version}.tar.gz
+Source0:	http://downloads.sourceforge.net/linux-gpib/%{pname}-%{version}.tar.gz
 # Source0-md5:	2d97191e538a57ba7350fcc011ee2596
-Patch0:		%{name}-include_file.patch
-Patch1:		%{name}-destdir.patch
-Patch2:		%{name}-python.patch
-Patch3:		%{name}-perl.patch
-Patch4:		%{name}-firmwaredir.patch
-Patch5:		%{name}-guile2.patch
-Patch6:		%{name}-php7.patch
+Patch0:		%{pname}-include_file.patch
+Patch1:		%{pname}-destdir.patch
+Patch2:		%{pname}-python.patch
+Patch3:		%{pname}-perl.patch
+Patch4:		%{pname}-firmwaredir.patch
+Patch5:		%{pname}-guile2.patch
+Patch6:		%{pname}-php7.patch
 URL:		http://linux-gpib.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -58,7 +70,7 @@ BuildRequires:	flex
 BuildRequires:	readline-devel
 %{?with_tcl:BuildRequires:	tcl-devel}
 %endif
-Requires:	%{name}-libs = %{version}-%{release}
+Requires:	%{pname}-libs = %{version}-%{release}
 # for agilent_82357a and ni_usb_gpib
 Suggests:	fxload
 # for agilent_82357a, agilent/hp_82341, agilent/hp_82350a, ni_usb_gpib
@@ -75,7 +87,7 @@ Pakiet Linux GPIB służy do obsługi sprzętu GPIB (IEEE 488).
 Summary:	Linux GPIB support for legacy USB hotplug
 Summary(pl.UTF-8):	Obsługa Linux GPIB dla starego systemu hotplug USB
 Group:		Applications/System
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{pname} = %{version}-%{release}
 Requires:	hotplug
 
 %description hotplug
@@ -99,7 +111,7 @@ Biblioteka współdzielona GPIB.
 Summary:	Header file for GPIB library
 Summary(pl.UTF-8):	Plik nagłówkowy biblioteki GPIB
 Group:		Development/Libraries
-Requires:	%{name}-libs = %{version}-%{release}
+Requires:	%{pname}-libs = %{version}-%{release}
 
 %description devel
 Header file for GPIB library.
@@ -111,7 +123,7 @@ Plik nagłówkowy biblioteki GPIB.
 Summary:	Static GPIB library
 Summary(pl.UTF-8):	Biblioteka statyczna GPIB
 Group:		Development/Libraries
-Requires:	%{name}-devel = %{version}-%{release}
+Requires:	%{pname}-devel = %{version}-%{release}
 
 %description static
 Static GPIB library.
@@ -123,7 +135,7 @@ Biblioteka statyczna GPIB.
 Summary:	Guile bindings for GPIB library
 Summary(pl.UTF-8):	Wiązania Guile do biblioteki GPIB
 Group:		Development/Languages/Perl
-Requires:	%{name}-libs = %{version}-%{release}
+Requires:	%{pname}-libs = %{version}-%{release}
 Requires:	guile-libs
 
 %description -n guile-gpib
@@ -136,7 +148,7 @@ Wiązania Guile do biblioteki GPIB.
 Summary:	Perl bindings for GPIB library
 Summary(pl.UTF-8):	Wiązania Perla do biblioteki GPIB
 Group:		Development/Languages/Perl
-Requires:	%{name}-libs = %{version}-%{release}
+Requires:	%{pname}-libs = %{version}-%{release}
 
 %description -n perl-gpib
 Perl bindings for GPIB library.
@@ -149,7 +161,7 @@ Summary:	PHP bindings for GPIB library
 Summary(pl.UTF-8):	Wiązania PHP do biblioteki GPIB
 Group:		Development/Languages/PHP
 Provides:	php(gpib) = %{version}
-Requires:	%{name}-libs = %{version}-%{release}
+Requires:	%{pname}-libs = %{version}-%{release}
 %{?requires_php_extension}
 
 %description -n %{php_name}-gpib
@@ -162,7 +174,7 @@ Wiązania PHP do biblioteki GPIB.
 Summary:	Python bindings for GPIB library
 Summary(pl.UTF-8):	Wiązania Pythona do biblioteki GPIB
 Group:		Libraries/Python
-Requires:	%{name}-libs = %{version}-%{release}
+Requires:	%{pname}-libs = %{version}-%{release}
 Requires:	python-libs
 
 %description -n python-gpib
@@ -175,7 +187,7 @@ Wiązania Pythona do biblioteki GPIB.
 Summary:	Tcl bindings for GPIB library
 Summary(pl.UTF-8):	Wiązania Tcl-a do biblioteki GPIB
 Group:		Libraries
-Requires:	%{name}-libs = %{version}-%{release}
+Requires:	%{pname}-libs = %{version}-%{release}
 Requires:	tcl
 
 %description -n tcl-gpib

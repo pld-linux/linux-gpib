@@ -242,6 +242,7 @@ TOPDIR=$(pwd)\
 %build_kernel_modules -C drivers/gpib -m gpib -- EARLYCPPFLAGS="-I$TOPDIR -I$TOPDIR/drivers/gpib/include -I$TOPDIR/include"\
 cd drivers/gpib\
 %install_kernel_modules -D installed -m agilent_82350b/agilent_82350b,cb7210/cb7210,cec/cec_gpib,hp_82335/hp82335,hp_82341/hp_82341,ines/ines_gpib,nec7210/nec7210,sys/gpib_common,tms9914/tms9914,tnt4882/tnt4882%{?with_drivers_isa:,pc2/pc2_gpib}%{?with_drivers_usb:,agilent_82357a/agilent_82357a,lpvo_usb_gpib/lpvo_usb_gpib,ni_usb/ni_usb_gpib} -d kernel/gpib\
+cd ../..\
 %{nil}
 
 %define install_kernel_pkg()\

@@ -12,7 +12,7 @@
 %bcond_without	static_libs	# static library
 %bcond_without	guile		# guile binding
 %bcond_without	perl		# Perl binding
-%bcond_without	php		# PHP binding
+%bcond_with	php		# PHP binding
 %bcond_without	python		# Python binding
 %bcond_without	tcl		# Tcl binding
 
@@ -33,7 +33,7 @@ exit 1
 %include	/usr/lib/rpm/macros.perl
 %define		php_name	php%{?php_suffix}
 
-%define		rel	6
+%define		rel	7
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa

@@ -33,7 +33,7 @@ exit 1
 %include	/usr/lib/rpm/macros.perl
 %define		php_name	php%{?php_suffix}
 
-%define		rel	8
+%define		rel	9
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
@@ -51,6 +51,7 @@ Patch3:		%{pname}-perl.patch
 Patch4:		%{pname}-firmwaredir.patch
 Patch5:		%{pname}-guile2.patch
 Patch6:		%{pname}-php7.patch
+Patch7:		kernel-4.11.patch
 URL:		http://linux-gpib.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -259,6 +260,7 @@ cd ../..\
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
 
 # disable modules build by default, just install userspace header
 echo 'SUBDIRS = gpib/include' > drivers/Makefile.am

@@ -24,14 +24,14 @@
  #endif
  
 @@ -550,7 +558,11 @@
-         memset(p,0,len+1);
+ 	memset(p,0,len+1);
  	r=ibrd(n,p,len);
-         p[ibcnt]='\0';
+ 	p[ibcnt]='\0';
 +#if PHP_MAJOR_VERSION >= 7
-+        ZVAL_STRING(z,p);
++	ZVAL_STRING(z,p);
 +#else
-         ZVAL_STRING(z,p,1);
+ 	ZVAL_STRING(z,p,1);
 +#endif
- 	free(p);
+ 	efree(p);
  	RETURN_LONG(r);
  }

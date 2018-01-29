@@ -33,18 +33,17 @@ exit 1
 %include	/usr/lib/rpm/macros.perl
 %define		php_name	php%{?php_suffix}
 
-%define		_rc	rc3
-%define		rel	0.%{_rc}.1
+%define		rel	1
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
 Name:		%{pname}%{?_pld_builder:%{?with_kernel:-kernel}}%{_alt_kernel}
-Version:	4.0.4
+Version:	4.1.0
 Release:	%{rel}%{?_pld_builder:%{?with_kernel:@%{_kernel_ver_str}}}
 License:	GPL v2+
 Group:		Applications/System
-Source0:	http://downloads.sourceforge.net/linux-gpib/%{pname}-%{version}%{_rc}.tar.gz
-# Source0-md5:	e12b4eeae623015c74f8ed01107e8f92
+Source0:	http://downloads.sourceforge.net/linux-gpib/%{pname}-%{version}.tar.gz
+# Source0-md5:	2614bb6dcfde4bf01f6047fdf0ea021f
 Patch0:		%{pname}-include_file.patch
 Patch1:		%{pname}-destdir.patch
 Patch2:		%{pname}-python.patch
@@ -53,6 +52,7 @@ Patch4:		%{pname}-firmwaredir.patch
 Patch5:		%{pname}-guile2.patch
 Patch6:		%{pname}-php7.patch
 Patch7:		kernel-4.11.patch
+Patch8:		kernel-4.15.patch
 URL:		http://linux-gpib.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -253,7 +253,7 @@ cd ../..\
 %{?with_kernel:%{expand:%create_kernel_packages}}
 
 %prep
-%setup -q -n %{pname}-%{version}%{_rc}
+%setup -q -n %{pname}-%{version}
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -262,6 +262,7 @@ cd ../..\
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%patch8 -p1
 
 # disable modules build by default, just install userspace header
 echo 'SUBDIRS = gpib/include' > drivers/Makefile.am
@@ -439,7 +440,7 @@ fi
 %if %{with guile}
 %files -n guile-gpib
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libgpib-guile-%{version}%{_rc}.so
+%attr(755,root,root) %{_libdir}/libgpib-guile-%{version}.so
 %attr(755,root,root) %{_libdir}/libgpib-guile.so
 %endif
 
@@ -459,7 +460,7 @@ fi
 %files -n %{php_name}-gpib
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) %{php_sysconfdir}/conf.d/gpib.ini
-%attr(755,root,root) %{php_extensiondir}/gpib_php-%{version}%{_rc}.so
+%attr(755,root,root) %{php_extensiondir}/gpib_php-%{version}.so
 %attr(755,root,root) %{php_extensiondir}/gpib_php.so
 %endif
 
@@ -476,7 +477,7 @@ fi
 %files -n tcl-gpib
 %defattr(644,root,root,755)
 %doc language/tcl/README
-%attr(755,root,root) %{_libdir}/libgpib_tcl-%{version}%{_rc}.so
+%attr(755,root,root) %{_libdir}/libgpib_tcl-%{version}.so
 %attr(755,root,root) %{_libdir}/libgpib_tcl.so
 %{_examplesdir}/tcl-gpib-%{version}
 %endif

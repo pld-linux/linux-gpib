@@ -287,6 +287,11 @@ done
 %build
 %if %{with userspace}
 cd linux-gpib-user-%{version}
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+%{__autoheader}
+%{__automake}
 %if %{with guile}
 CPPFLAGS="%{rpmcppflags} -I/usr/include/guile/2.0"
 %endif
@@ -318,10 +323,12 @@ install -d $RPM_BUILD_ROOT%{_examplesdir}
 cd linux-gpib-kernel-%{version}
 %{expand:%install_kernel_packages}
 cp -a drivers/gpib/installed/* $RPM_BUILD_ROOT
+cd ..
 %endif
 
 %if %{with userspace}
-%{__make} -C linux-gpib-user-%{version} install \
+cd linux-gpib-user-%{version}
+%{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT \
 	HOTPLUG_USB_CONF_DIR=/lib/udev \
 	UDEV_RULES_DIR=/lib/udev/rules.d \
@@ -384,8 +391,7 @@ cp -pr language/tcl/examples $RPM_BUILD_ROOT%{_examplesdir}/tcl-gpib-%{version}
 
 %if %{with docs}
 # packaged as %doc
-%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/linux-gpib/html
-%endif
+%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/linux-gpib-user/html
 %endif
 
 %clean
@@ -411,6 +417,7 @@ fi
 %if %{with userspace}
 %files
 %defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/gpib.conf
 %attr(755,root,root) %{_bindir}/ibterm
 %attr(755,root,root) %{_bindir}/ibtest
 %attr(755,root,root) %{_sbindir}/gpib_config
@@ -431,7 +438,7 @@ fi
 
 %files libs
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog README README.HAMEG README.hp82335 TODO
+%doc linux-gpib-user-%{version}/{AUTHORS,ChangeLog,README,README.HAMEG,README.hp82335,TODO}
 %attr(755,root,root) %{_libdir}/libgpib.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libgpib.so.0
 
@@ -457,7 +464,7 @@ fi
 %if %{with perl}
 %files -n perl-gpib
 %defattr(644,root,root,755)
-%doc language/perl/{Changes,README}
+%doc linux-gpib-user-%{version}/language/perl/{Changes,README}
 %{perl_vendorarch}/LinuxGpib.pm
 %dir %{perl_vendorarch}/auto/LinuxGpib
 %attr(755,root,root) %{perl_vendorarch}/auto/LinuxGpib/LinuxGpib.so
@@ -477,7 +484,7 @@ fi
 %if %{with python}
 %files -n python-gpib
 %defattr(644,root,root,755)
-%doc language/python/README
+%doc linux-gpib-user-%{version}/language/python/README
 %attr(755,root,root) %{py_sitedir}/gpib.so
 %{py_sitedir}/Gpib.py[co]
 %{py_sitedir}/gpib-1.0-py*.egg-info
@@ -486,7 +493,7 @@ fi
 %if %{with tcl}
 %files -n tcl-gpib
 %defattr(644,root,root,755)
-%doc language/tcl/README
+%doc linux-gpib-user-%{version}/language/tcl/README
 %attr(755,root,root) %{_libdir}/libgpib_tcl-%{version}.so
 %attr(755,root,root) %{_libdir}/libgpib_tcl.so
 %{_examplesdir}/tcl-gpib-%{version}
@@ -495,6 +502,6 @@ fi
 %if %{with docs}
 %files doc
 %defattr(644,root,root,755)
-%doc doc/doc_html/*
+%doc linux-gpib-user-%{version}/doc/doc_html/*
 %endif
 %endif

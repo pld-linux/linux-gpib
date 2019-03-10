@@ -1,10 +1,10 @@
---- linux-gpib-4.0.3/usb/agilent_82357a/agilent_82357a.orig	2016-04-09 15:33:10.000000000 +0200
-+++ linux-gpib-4.0.3/usb/agilent_82357a/agilent_82357a	2016-07-05 22:01:15.232112298 +0200
+--- linux-gpib-4.0.3/usb/agilent_82357a/agilent_82357a.in.orig	2016-04-09 15:33:10.000000000 +0200
++++ linux-gpib-4.0.3/usb/agilent_82357a/agilent_82357a.in	2016-07-05 22:01:15.232112298 +0200
 @@ -1,7 +1,7 @@
  #!/bin/sh
  
  GPIB_CONFIG_OPTIONS="--minor 0"
--DATADIR=/usr/share
+-DATADIR=@datadir@
 +FIRMWAREDIR=/lib/firmware
  FXLOAD=fxload
  FXLOAD_OPTIONS=
@@ -27,13 +27,13 @@
  	FXLOAD_OPTIONS="-t fx2"
  	;;
  
---- linux-gpib-4.0.3/usb/ni_usb_gpib/ni_usb_gpib.orig	2016-04-09 15:33:10.000000000 +0200
-+++ linux-gpib-4.0.3/usb/ni_usb_gpib/ni_usb_gpib	2016-07-05 22:01:43.015295116 +0200
+--- linux-gpib-4.0.3/usb/ni_usb_gpib/ni_usb_gpib.in.orig	2016-04-09 15:33:10.000000000 +0200
++++ linux-gpib-4.0.3/usb/ni_usb_gpib/ni_usb_gpib.in	2016-07-05 22:01:43.015295116 +0200
 @@ -1,7 +1,7 @@
  #!/bin/sh
  
  GPIB_CONFIG_OPTIONS="--minor 0"
--DATADIR=/usr/share
+-DATADIR=@datadir@
 +FIRMWAREDIR=/lib/firmware
  FXLOAD=fxload
  FXLOAD_OPTIONS="-t fx"

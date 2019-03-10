@@ -33,26 +33,23 @@ exit 1
 %include	/usr/lib/rpm/macros.perl
 %define		php_name	php%{?php_suffix}
 
-%define		rel	3
+%define		rel	0.1
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
 Name:		%{pname}%{?_pld_builder:%{?with_kernel:-kernel}}%{_alt_kernel}
-Version:	4.1.0
+Version:	4.2.0
 Release:	%{rel}%{?_pld_builder:%{?with_kernel:@%{_kernel_ver_str}}}
 License:	GPL v2+
 Group:		Applications/System
 Source0:	http://downloads.sourceforge.net/linux-gpib/%{pname}-%{version}.tar.gz
-# Source0-md5:	2614bb6dcfde4bf01f6047fdf0ea021f
-Patch0:		%{pname}-include_file.patch
-Patch1:		%{pname}-destdir.patch
+# Source0-md5:	0241dcc2d16f6d12a7aa2c3a623a55ff
 Patch2:		%{pname}-python.patch
 Patch3:		%{pname}-perl.patch
 Patch4:		%{pname}-firmwaredir.patch
 Patch5:		%{pname}-guile2.patch
 Patch6:		%{pname}-php7.patch
-Patch7:		kernel-4.11.patch
-Patch8:		kernel-4.15.patch
+Patch7:		kernel-5.0.patch
 URL:		http://linux-gpib.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -240,8 +237,16 @@ Ten pakiet zawiera sterowniki dla Linuksa do urządzeń GPIB (IEEE 488).\
 %{nil}
 
 %define build_kernel_pkg()\
-TOPDIR=$(pwd)\
-%build_kernel_modules -C drivers/gpib -m gpib -- EARLYCPPFLAGS="-I$TOPDIR -I$TOPDIR/drivers/gpib/include -I$TOPDIR/include"\
+%configure \\\
+	%{?with_drivers_isa:--enable-isa} \\\
+	%{?with_drivers_pcmcia:--enable-pcmcia} \\\
+	%{!?with_docs:--disable-documentation} \\\
+	%{!?with_guile:--disable-guile-binding} \\\
+	%{!?with_perl:--disable-perl-binding} \\\
+	%{!?with_python:--disable-python-binding} \\\
+	%{!?with_tcl:--disable-tcl-binding} \\\
+	--with-linux-srcdir=%{_kernelsrcdir}\
+%{__make}\
 cd drivers/gpib\
 %install_kernel_modules -D installed -m agilent_82350b/agilent_82350b,cb7210/cb7210,cec/cec_gpib,hp_82335/hp82335,hp_82341/hp_82341,ines/ines_gpib,nec7210/nec7210,sys/gpib_common,tms9914/tms9914,tnt4882/tnt4882%{?with_drivers_isa:,pc2/pc2_gpib}%{?with_drivers_usb:,agilent_82357a/agilent_82357a,lpvo_usb_gpib/lpvo_usb_gpib,ni_usb/ni_usb_gpib} -d kernel/gpib\
 cd ../..\
@@ -254,15 +259,21 @@ cd ../..\
 
 %prep
 %setup -q -n %{pname}-%{version}
-%patch0 -p1
-%patch1 -p1
+%if %{with userspace}
+tar xzf linux-gpib-user-%{version}.tar.gz
+cd linux-gpib-user-%{version}
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
-%patch6 -p1
+#%patch6 -p1
+cd ..
+%endif
+
+%if %{with kernel}
+tar xzf linux-gpib-kernel-%{version}.tar.gz
+cd linux-gpib-kernel-%{version}
 %patch7 -p1
-%patch8 -p1
 
 # disable modules build by default, just install userspace header
 echo 'SUBDIRS = gpib/include' > drivers/Makefile.am
@@ -271,13 +282,11 @@ echo 'SUBDIRS = gpib/include' > drivers/Makefile.am
 for f in drivers/gpib/*/Makefile ; do
 echo 'override CC += $(EARLYCPPFLAGS)' >> $f
 done
+%endif
 
 %build
-%{__libtoolize}
-%{__aclocal} -I m4
-%{__autoconf}
-%{__autoheader}
-%{__automake}
+%if %{with userspace}
+cd linux-gpib-user-%{version}
 %if %{with guile}
 CPPFLAGS="%{rpmcppflags} -I/usr/include/guile/2.0"
 %endif
@@ -290,14 +299,14 @@ CPPFLAGS="%{rpmcppflags} -I/usr/include/guile/2.0"
 	%{!?with_php:--disable-php-binding} \
 	%{!?with_python:--disable-python-binding} \
 	%{?with_static_libs:--enable-static} \
-	%{!?with_tcl:--disable-tcl-binding} \
-	--with-linux-srcdir=%{_kernelsrcdir}
+	%{!?with_tcl:--disable-tcl-binding}
 
-%if %{with userspace}
 %{__make}
+cd ..
 %endif
 
 %if %{with kernel}
+cd linux-gpib-kernel-%{version}
 %{expand:%build_kernel_packages}
 %endif
 
@@ -306,12 +315,13 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_examplesdir}
 
 %if %{with kernel}
+cd linux-gpib-kernel-%{version}
 %{expand:%install_kernel_packages}
 cp -a drivers/gpib/installed/* $RPM_BUILD_ROOT
 %endif
 
 %if %{with userspace}
-%{__make} install \
+%{__make} -C linux-gpib-user-%{version} install \
 	DESTDIR=$RPM_BUILD_ROOT \
 	HOTPLUG_USB_CONF_DIR=/lib/udev \
 	UDEV_RULES_DIR=/lib/udev/rules.d \

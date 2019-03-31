@@ -33,7 +33,7 @@ exit 1
 %include	/usr/lib/rpm/macros.perl
 %define		php_name	php%{?php_suffix}
 
-%define		rel	1
+%define		rel	2
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
@@ -293,7 +293,7 @@ cd linux-gpib-user-%{version}
 %{__autoheader}
 %{__automake}
 %if %{with guile}
-CPPFLAGS="%{rpmcppflags} -I/usr/include/guile/2.0"
+CPPFLAGS="%{rpmcppflags} -I/usr/include/guile/2.2"
 %endif
 %configure \
 	%{?with_drivers_isa:--enable-isa} \

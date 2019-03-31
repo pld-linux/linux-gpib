@@ -1,13 +1,14 @@
 --- linux-gpib-4.0.3/configure.ac.orig	2016-04-09 15:34:55.000000000 +0200
 +++ linux-gpib-4.0.3/configure.ac	2016-07-06 17:55:18.567320365 +0200
-@@ -143,8 +143,10 @@
+@@ -143,8 +143,11 @@
  fi
  
  dnl Checks for libraries.
++AC_CHECK_LIB([guile-2.2],[scm_c_define],[:],[
 +AC_CHECK_LIB([guile-2.0],[scm_c_define],[:],[
  AC_CHECK_LIB([guile],[gh_define],[echo this prevents default actions from occurring > /dev/null],
  	[BIND_GUILE="no";AC_MSG_NOTICE([libguile not found, disabling guile binding])],[])
-+])
++])])
  
  AC_CHECK_LIB([readline], [readline], 
    	     [readline_lib=yes;AC_SUBST([LIB_READLINE_LDFLAGS], ["-lreadline -lncurses"])],

@@ -33,7 +33,7 @@ exit 1
 %include	/usr/lib/rpm/macros.perl
 %define		php_name	php%{?php_suffix}
 
-%define		rel	2
+%define		rel	3
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
@@ -50,6 +50,7 @@ Patch4:		%{pname}-firmwaredir.patch
 Patch5:		%{pname}-guile2.patch
 Patch6:		%{pname}-php7.patch
 Patch7:		kernel-5.0.patch
+Patch8:		kernel-5.2.patch
 URL:		http://linux-gpib.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -248,7 +249,11 @@ Ten pakiet zawiera sterowniki dla Linuksa do urządzeń GPIB (IEEE 488).\
 	--with-linux-srcdir=%{_kernelsrcdir}\
 %{__make}\
 cd drivers/gpib\
+%ifarch %{ix86}\
+%install_kernel_modules -D installed -m agilent_82350b/agilent_82350b,cb7210/cb7210,cec/cec_gpib,hp_82335/hp82335,ines/ines_gpib,nec7210/nec7210,sys/gpib_common,tms9914/tms9914,tnt4882/tnt4882%{?with_drivers_isa:,pc2/pc2_gpib}%{?with_drivers_usb:,agilent_82357a/agilent_82357a,lpvo_usb_gpib/lpvo_usb_gpib,ni_usb/ni_usb_gpib} -d kernel/gpib\
+%else\
 %install_kernel_modules -D installed -m agilent_82350b/agilent_82350b,cb7210/cb7210,cec/cec_gpib,hp_82335/hp82335,hp_82341/hp_82341,ines/ines_gpib,nec7210/nec7210,sys/gpib_common,tms9914/tms9914,tnt4882/tnt4882%{?with_drivers_isa:,pc2/pc2_gpib}%{?with_drivers_usb:,agilent_82357a/agilent_82357a,lpvo_usb_gpib/lpvo_usb_gpib,ni_usb/ni_usb_gpib} -d kernel/gpib\
+%endif\
 cd ../..\
 %{nil}
 
@@ -274,6 +279,9 @@ cd ..
 tar xzf linux-gpib-kernel-%{version}.tar.gz
 cd linux-gpib-kernel-%{version}
 %patch7 -p1
+%ifarch %{ix86}
+%patch8 -p1
+%endif
 
 # disable modules build by default, just install userspace header
 echo 'SUBDIRS = gpib/include' > drivers/Makefile.am
@@ -392,6 +400,7 @@ cp -pr language/tcl/examples $RPM_BUILD_ROOT%{_examplesdir}/tcl-gpib-%{version}
 %if %{with docs}
 # packaged as %doc
 %{__rm} -r $RPM_BUILD_ROOT%{_datadir}/linux-gpib-user/html
+%endif
 %endif
 
 %clean

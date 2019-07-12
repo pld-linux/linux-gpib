@@ -1,0 +1,10 @@
+--- linux-gpib-kernel-4.2.0/drivers/gpib/Makefile~	2018-11-07 15:58:07.000000000 +0100
++++ linux-gpib-kernel-4.2.0/drivers/gpib/Makefile	2019-07-12 16:49:53.176504410 +0200
+@@ -6,7 +6,6 @@
+ obj-y += cec/
+ obj-y += fmh_gpib/
+ obj-y += hp_82335/
+-obj-y += hp_82341/
+ obj-y += ines/
+ obj-$(CONFIG_USB) += lpvo_usb_gpib/
+ obj-y += nec7210/

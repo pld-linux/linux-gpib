@@ -49,7 +49,6 @@ Patch3:		%{pname}-perl.patch
 Patch4:		%{pname}-firmwaredir.patch
 Patch5:		%{pname}-guile2.patch
 Patch6:		%{pname}-php7.patch
-Patch7:		kernel-5.0.patch
 Patch8:		kernel-5.2.patch
 URL:		http://linux-gpib.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
@@ -269,15 +268,9 @@ cd ..
 %if %{with kernel}
 tar xzf linux-gpib-kernel-%{version}.tar.gz
 cd linux-gpib-kernel-%{version}
-#%patch7 -p1
-#%ifarch %{ix86}
-#%patch8 -p1
-#%endif
-
-# need to inject -I options before $(LINUXINCLUDE), the simplest way is to override CC
-#for f in drivers/gpib/*/Makefile ; do
-#echo 'override CC += $(EARLYCPPFLAGS)' >> $f
-#done
+%ifarch %{ix86}
+%patch8 -p1
+%endif
 %endif
 
 %build

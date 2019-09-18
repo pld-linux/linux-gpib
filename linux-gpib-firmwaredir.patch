@@ -1,51 +1,22 @@
---- linux-gpib-4.0.3/usb/agilent_82357a/agilent_82357a.in.orig	2016-04-09 15:33:10.000000000 +0200
-+++ linux-gpib-4.0.3/usb/agilent_82357a/agilent_82357a.in	2016-07-05 22:01:15.232112298 +0200
-@@ -1,7 +1,7 @@
- #!/bin/sh
+--- linux-gpib-user-4.3.0/usb/agilent_82357a/Makefile.am~	2019-08-23 10:30:11.000000000 +0200
++++ linux-gpib-user-4.3.0/usb/agilent_82357a/Makefile.am	2019-09-18 17:53:41.226519040 +0200
+@@ -10,7 +10,7 @@
+ EXTRA_DIST = 99-agilent_82357a.rules.in
+ CLEANFILES = 99-agilent_82357a.rules
  
- GPIB_CONFIG_OPTIONS="--minor 0"
--DATADIR=@datadir@
-+FIRMWAREDIR=/lib/firmware
- FXLOAD=fxload
- FXLOAD_OPTIONS=
+-USB_FIRMWARE_DIR=$(datadir)/usb
++USB_FIRMWARE_DIR=/lib/firmware
+ UDEV_RULES_DIR=$(sysconfdir)/udev/rules.d
  
-@@ -47,7 +47,7 @@
+ do_subst = $(SED) -e 's,[@]sbindir[@],$(sbindir),g'\
+--- linux-gpib-user-4.3.0/usb/ni_usb_gpib/Makefile.am~	2019-08-23 10:30:11.000000000 +0200
++++ linux-gpib-user-4.3.0/usb/ni_usb_gpib/Makefile.am	2019-09-18 17:54:07.033184839 +0200
+@@ -10,7 +10,7 @@
+ EXTRA_DIST = 99-ni_usb_gpib.rules.in
+ CLEANFILES = 99-ni_usb_gpib.rules
  
- # 82357a without firmware
- 957/7/*)
--	FIRMWARE=$DATADIR/usb/agilent_82357a/82357a_fw.hex
-+	FIRMWARE=$FIRMWAREDIR/agilent_82357a/82357a_fw.hex
- 	;;
+-USB_FIRMWARE_DIR=$(datadir)/usb
++USB_FIRMWARE_DIR=/lib/firmware
+ UDEV_RULES_DIR=$(sysconfdir)/udev/rules.d
  
- # 82357b with firmware already loaded
-@@ -57,7 +57,7 @@
- 
- # 82357b without firmware
- 957/518/*)
--	FIRMWARE=$DATADIR/usb/agilent_82357a/measat_releaseX1.8.hex
-+	FIRMWARE=$FIRMWAREDIR/agilent_82357a/measat_releaseX1.8.hex
- 	FXLOAD_OPTIONS="-t fx2"
- 	;;
- 
---- linux-gpib-4.0.3/usb/ni_usb_gpib/ni_usb_gpib.in.orig	2016-04-09 15:33:10.000000000 +0200
-+++ linux-gpib-4.0.3/usb/ni_usb_gpib/ni_usb_gpib.in	2016-07-05 22:01:43.015295116 +0200
-@@ -1,7 +1,7 @@
- #!/bin/sh
- 
- GPIB_CONFIG_OPTIONS="--minor 0"
--DATADIR=@datadir@
-+FIRMWAREDIR=/lib/firmware
- FXLOAD=fxload
- FXLOAD_OPTIONS="-t fx"
- 
-@@ -48,8 +48,8 @@
- 
- # ni-usb-b or kusb-488 without firmware
- 3923/702b/* | 3923/713b/*)
--	FIRMWARE=$DATADIR/usb/ni_usb_gpib/niusbb_firmware.hex
--	SS_LOADER=$DATADIR/usb/ni_usb_gpib/niusbb_loader.hex
-+	FIRMWARE=$FIRMWAREDIR/ni_usb_gpib/niusbb_firmware.hex
-+	SS_LOADER=$FIRMWAREDIR/ni_usb_gpib/niusbb_loader.hex
- 	;;
- 
- # ni-usb-hs
+ do_subst = $(SED) -e 's,[@]sbindir[@],$(sbindir),g'\

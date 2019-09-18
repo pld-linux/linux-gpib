@@ -33,17 +33,17 @@ exit 1
 %include	/usr/lib/rpm/macros.perl
 %define		php_name	php%{?php_suffix}
 
-%define		rel	3
+%define		rel	1
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
 Name:		%{pname}%{?_pld_builder:%{?with_kernel:-kernel}}%{_alt_kernel}
-Version:	4.2.0
+Version:	4.3.0
 Release:	%{rel}%{?_pld_builder:%{?with_kernel:@%{_kernel_ver_str}}}
 License:	GPL v2+
 Group:		Applications/System
 Source0:	http://downloads.sourceforge.net/linux-gpib/%{pname}-%{version}.tar.gz
-# Source0-md5:	0241dcc2d16f6d12a7aa2c3a623a55ff
+# Source0-md5:	3085422695baf210b866601db6108860
 Patch2:		%{pname}-python.patch
 Patch3:		%{pname}-perl.patch
 Patch4:		%{pname}-firmwaredir.patch
@@ -238,16 +238,7 @@ Ten pakiet zawiera sterowniki dla Linuksa do urządzeń GPIB (IEEE 488).\
 %{nil}
 
 %define build_kernel_pkg()\
-%configure \\\
-	%{?with_drivers_isa:--enable-isa} \\\
-	%{?with_drivers_pcmcia:--enable-pcmcia} \\\
-	%{!?with_docs:--disable-documentation} \\\
-	%{!?with_guile:--disable-guile-binding} \\\
-	%{!?with_perl:--disable-perl-binding} \\\
-	%{!?with_python:--disable-python-binding} \\\
-	%{!?with_tcl:--disable-tcl-binding} \\\
-	--with-linux-srcdir=%{_kernelsrcdir}\
-%{__make}\
+%{__make} VERBOSE=1 LINUX_SRCDIR=%{_kernelsrcdir}\
 cd drivers/gpib\
 %ifarch %{ix86}\
 %install_kernel_modules -D installed -m agilent_82350b/agilent_82350b,cb7210/cb7210,cec/cec_gpib,hp_82335/hp82335,ines/ines_gpib,nec7210/nec7210,sys/gpib_common,tms9914/tms9914,tnt4882/tnt4882%{?with_drivers_isa:,pc2/pc2_gpib}%{?with_drivers_usb:,agilent_82357a/agilent_82357a,lpvo_usb_gpib/lpvo_usb_gpib,ni_usb/ni_usb_gpib} -d kernel/gpib\
@@ -278,18 +269,15 @@ cd ..
 %if %{with kernel}
 tar xzf linux-gpib-kernel-%{version}.tar.gz
 cd linux-gpib-kernel-%{version}
-%patch7 -p1
-%ifarch %{ix86}
-%patch8 -p1
-%endif
-
-# disable modules build by default, just install userspace header
-echo 'SUBDIRS = gpib/include' > drivers/Makefile.am
+#%patch7 -p1
+#%ifarch %{ix86}
+#%patch8 -p1
+#%endif
 
 # need to inject -I options before $(LINUXINCLUDE), the simplest way is to override CC
-for f in drivers/gpib/*/Makefile ; do
-echo 'override CC += $(EARLYCPPFLAGS)' >> $f
-done
+#for f in drivers/gpib/*/Makefile ; do
+#echo 'override CC += $(EARLYCPPFLAGS)' >> $f
+#done
 %endif
 
 %build
@@ -304,6 +292,7 @@ cd linux-gpib-user-%{version}
 CPPFLAGS="%{rpmcppflags} -I/usr/include/guile/2.2"
 %endif
 %configure \
+	--with-udev-libdir=/lib/udev \
 	%{?with_drivers_isa:--enable-isa} \
 	%{?with_drivers_pcmcia:--enable-pcmcia} \
 	%{!?with_docs:--disable-documentation} \
@@ -348,8 +337,6 @@ install -d $RPM_BUILD_ROOT/etc/hotplug/usb
 %{__mv} $RPM_BUILD_ROOT/lib/udev/*.usermap $RPM_BUILD_ROOT/etc/hotplug/usb
 ln -snf /lib/udev/agilent_82357a $RPM_BUILD_ROOT/etc/hotplug/usb/agilent_82357a
 ln -snf /lib/udev/ni_usb_gpib $RPM_BUILD_ROOT/etc/hotplug/usb/ni_usb_gpib
-%else
-%{__rm} $RPM_BUILD_ROOT/lib/udev/*.usermap
 %endif
 
 # obsoleted by pkg-config
@@ -430,11 +417,12 @@ fi
 %attr(755,root,root) %{_bindir}/ibterm
 %attr(755,root,root) %{_bindir}/ibtest
 %attr(755,root,root) %{_sbindir}/gpib_config
+/lib/udev/rules.d/98-gpib-generic.rules
 /lib/udev/rules.d/99-agilent_82357a.rules
-/lib/udev/rules.d/99-gpib-generic.rules
 /lib/udev/rules.d/99-ni_usb_gpib.rules
-%attr(755,root,root) /lib/udev/agilent_82357a
-%attr(755,root,root) /lib/udev/ni_usb_gpib
+%attr(755,root,root) /lib/udev/gpib_udev_config
+%attr(755,root,root) /lib/udev/gpib_udev_fxloader
+%attr(755,root,root) /lib/udev/gpib_udevadm_wrapper
 
 %if %{with hotplug}
 %files hotplug

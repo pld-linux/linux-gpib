@@ -33,7 +33,7 @@ exit 1
 %include	/usr/lib/rpm/macros.perl
 %define		php_name	php%{?php_suffix}
 
-%define		rel	2
+%define		rel	3
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa

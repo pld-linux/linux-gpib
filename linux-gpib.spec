@@ -30,7 +30,6 @@ exit 1
 %undefine	with_drivers_pcmcia
 %endif
 
-%include	/usr/lib/rpm/macros.perl
 %define		php_name	php%{?php_suffix}
 
 %define		rel	4

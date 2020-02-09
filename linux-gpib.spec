@@ -32,7 +32,7 @@ exit 1
 
 %define		php_name	php%{?php_suffix}
 
-%define		rel	4
+%define		rel	5
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa

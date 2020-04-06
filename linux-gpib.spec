@@ -32,7 +32,7 @@ exit 1
 
 %define		php_name	php%{?php_suffix}
 
-%define		rel	5
+%define		rel	6
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
@@ -49,6 +49,7 @@ Patch4:		%{pname}-firmwaredir.patch
 Patch5:		%{pname}-guile2.patch
 Patch6:		%{pname}-php7.patch
 Patch8:		kernel-5.2.patch
+Patch9:		kernel-5.6.patch
 URL:		http://linux-gpib.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -270,6 +271,7 @@ cd linux-gpib-kernel-%{version}
 %ifarch %{ix86}
 %patch8 -p1
 %endif
+%patch9 -p1
 %endif
 
 %build

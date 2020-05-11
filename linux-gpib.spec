@@ -7,7 +7,7 @@
 %bcond_without	userspace	# userspace packages
 %bcond_without	verbose		# verbose modules build (V=1)
 
-%bcond_without	docs		# documentation build
+%bcond_without	doc		# documentation build
 %bcond_with	hotplug		# legacy hotplug support
 %bcond_without	static_libs	# static library
 %bcond_without	guile		# guile binding
@@ -60,7 +60,7 @@ BuildRequires:	kernel-module-build >= 3:2.6.8
 %endif
 %if %{with userspace}
 BuildRequires:	bison
-%{?with_docs:BuildRequires:	docbook-utils}
+%{?with_doc:BuildRequires:	docbook-utils}
 BuildRequires:	flex
 %{?with_guile:BuildRequires:	guile-devel >= 1.4}
 %{?with_perl:BuildRequires:	perl-devel}
@@ -289,7 +289,7 @@ CPPFLAGS="%{rpmcppflags} -I/usr/include/guile/2.2"
 	--with-udev-libdir=/lib/udev \
 	%{?with_drivers_isa:--enable-isa} \
 	%{?with_drivers_pcmcia:--enable-pcmcia} \
-	%{!?with_docs:--disable-documentation} \
+	%{!?with_doc:--disable-documentation} \
 	%{!?with_guile:--disable-guile-binding} \
 	%{!?with_perl:--disable-perl-binding} \
 	%{!?with_php:--disable-php-binding} \
@@ -378,7 +378,7 @@ cp -pr language/tcl/examples $RPM_BUILD_ROOT%{_examplesdir}/tcl-gpib-%{version}
 %endif
 %endif
 
-%if %{with docs}
+%if %{with doc}
 # packaged as %doc
 %{__rm} -r $RPM_BUILD_ROOT%{_datadir}/linux-gpib-user/html
 %endif
@@ -490,7 +490,7 @@ fi
 %{_examplesdir}/tcl-gpib-%{version}
 %endif
 
-%if %{with docs}
+%if %{with doc}
 %files doc
 %defattr(644,root,root,755)
 %doc linux-gpib-user-%{version}/doc/doc_html/*

@@ -2,7 +2,6 @@
 # Conditional build:
 %bcond_without	kernel		# kernel modules
 %bcond_without	drivers_isa	# ISA kernel drivers [ix86 only]
-%bcond_without	drivers_pcmcia	# PCMCIA support in kernel drivers
 %bcond_without	drivers_usb	# USB kernel drivers
 %bcond_without	userspace	# userspace packages
 %bcond_without	verbose		# verbose modules build (V=1)
@@ -13,7 +12,8 @@
 %bcond_without	guile		# guile binding
 %bcond_without	perl		# Perl binding
 %bcond_with	php		# PHP binding
-%bcond_without	python		# Python binding
+%bcond_without	python		# Python (any) binding
+%bcond_without	python2		# Python 2.x binding
 %bcond_without	tcl		# Tcl binding
 
 # The goal here is to have main, userspace, package built once with
@@ -27,34 +27,35 @@ exit 1
 
 %ifnarch %{ix86}
 %undefine	with_drivers_isa
-%undefine	with_drivers_pcmcia
+%endif
+%if %{without python}
+%undefine	with_python2
 %endif
 
 %define		php_name	php%{?php_suffix}
 
-%define		rel	6
+%define		rel	1
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
 Name:		%{pname}%{?_pld_builder:%{?with_kernel:-kernel}}%{_alt_kernel}
-Version:	4.3.0
+Version:	4.3.3
 Release:	%{rel}%{?_pld_builder:%{?with_kernel:@%{_kernel_ver_str}}}
 License:	GPL v2+
 Group:		Applications/System
 Source0:	http://downloads.sourceforge.net/linux-gpib/%{pname}-%{version}.tar.gz
-# Source0-md5:	3085422695baf210b866601db6108860
+# Source0-md5:	1243aa44f788cf23f9b40ded54c14685
 Patch2:		%{pname}-python.patch
 Patch3:		%{pname}-perl.patch
 Patch4:		%{pname}-firmwaredir.patch
 Patch5:		%{pname}-guile2.patch
 Patch6:		%{pname}-php7.patch
 Patch8:		kernel-5.2.patch
-Patch9:		kernel-5.6.patch
 URL:		http://linux-gpib.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
 BuildRequires:	libtool
-BuildRequires:	rpmbuild(macros) >= 1.614
+BuildRequires:	rpmbuild(macros) >= 1.745
 %if %{with kernel}
 BuildRequires:	kernel-module-build >= 3:2.6.8
 %endif
@@ -170,17 +171,30 @@ PHP bindings for GPIB library.
 Wiązania PHP do biblioteki GPIB.
 
 %package -n python-gpib
-Summary:	Python bindings for GPIB library
-Summary(pl.UTF-8):	Wiązania Pythona do biblioteki GPIB
+Summary:	Python 2 bindings for GPIB library
+Summary(pl.UTF-8):	Wiązania Pythona 2 do biblioteki GPIB
 Group:		Libraries/Python
 Requires:	%{pname}-libs = %{version}-%{release}
 Requires:	python-libs
 
 %description -n python-gpib
-Python bindings for GPIB library.
+Python 2 bindings for GPIB library.
 
 %description -n python-gpib -l pl.UTF-8
-Wiązania Pythona do biblioteki GPIB.
+Wiązania Pythona 2 do biblioteki GPIB.
+
+%package -n python3-gpib
+Summary:	Python 3 bindings for GPIB library
+Summary(pl.UTF-8):	Wiązania Pythona 3 do biblioteki GPIB
+Group:		Libraries/Python
+Requires:	%{pname}-libs = %{version}-%{release}
+Requires:	python3-libs
+
+%description -n python3-gpib
+Python 3 bindings for GPIB library.
+
+%description -n python3-gpib -l pl.UTF-8
+Wiązania Pythona 3 do biblioteki GPIB.
 
 %package -n tcl-gpib
 Summary:	Tcl bindings for GPIB library
@@ -271,7 +285,6 @@ cd linux-gpib-kernel-%{version}
 %ifarch %{ix86}
 %patch8 -p1
 %endif
-%patch9 -p1
 %endif
 
 %build
@@ -287,8 +300,6 @@ CPPFLAGS="%{rpmcppflags} -I/usr/include/guile/2.2"
 %endif
 %configure \
 	--with-udev-libdir=/lib/udev \
-	%{?with_drivers_isa:--enable-isa} \
-	%{?with_drivers_pcmcia:--enable-pcmcia} \
 	%{!?with_doc:--disable-documentation} \
 	%{!?with_guile:--disable-guile-binding} \
 	%{!?with_perl:--disable-perl-binding} \
@@ -298,6 +309,12 @@ CPPFLAGS="%{rpmcppflags} -I/usr/include/guile/2.2"
 	%{!?with_tcl:--disable-tcl-binding}
 
 %{__make}
+
+%if %{with python2}
+cd language/python
+%py_build
+cd ../..
+%endif
 cd ..
 %endif
 
@@ -324,6 +341,12 @@ cd linux-gpib-user-%{version}
 	HOTPLUG_USB_CONF_DIR=/lib/udev \
 	UDEV_RULES_DIR=/lib/udev/rules.d \
 	USB_FIRMWARE_DIR=/lib/firmware
+
+%if %{with python2}
+cd language/python
+%py_install
+cd ../..
+%endif
 
 %if %{with hotplug}
 # use udev paths as base and legacy hotplug as addon (not the opposite)
@@ -472,13 +495,23 @@ fi
 %attr(755,root,root) %{php_extensiondir}/gpib_php.so
 %endif
 
-%if %{with python}
+%if %{with python2}
 %files -n python-gpib
 %defattr(644,root,root,755)
 %doc linux-gpib-user-%{version}/language/python/README
 %attr(755,root,root) %{py_sitedir}/gpib.so
 %{py_sitedir}/Gpib.py[co]
 %{py_sitedir}/gpib-1.0-py*.egg-info
+%endif
+
+%if %{with python}
+%files -n python3-gpib
+%defattr(644,root,root,755)
+%doc linux-gpib-user-%{version}/language/python/README
+%attr(755,root,root) %{py3_sitedir}/gpib.cpython-*.so
+%{py3_sitedir}/Gpib.py
+%{py3_sitedir}/__pycache__/Gpib.cpython-*.py[co]
+%{py3_sitedir}/gpib-1.0-py*.egg-info
 %endif
 
 %if %{with tcl}

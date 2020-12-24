@@ -1,0 +1,30 @@
+------------------------------------------------------------------------
+r1927 | dpenkler | 2020-11-23 12:54:12 +0100 (Mon, 23 Nov 2020) | 1 line
+
+Exclude compilation of lpvo for KERNEL >= 5.10
+
+Index: linux-gpib-kernel/drivers/gpib/Makefile
+===================================================================
+--- linux-gpib-kernel/drivers/gpib/Makefile	(revision 1926)
++++ linux-gpib-kernel/drivers/gpib/Makefile	(revision 1927)
+@@ -2,6 +2,9 @@
+ 	LINUXINCLUDE := -I$(GPIB_TOP_DIR)/compat/include $(LINUXINCLUDE)
+ endif
+ 
++KERNEL_GE_5_10 = $(shell expr \( $(VERSION) '>' "5" \) \| \
++ \( \( $(VERSION) '=' "5" \) \& \( $(PATCHLEVEL) '>=' 10 \) \) )
++
+ subdir-ccflags-y := -I$(src)/include \
+ 			-DHAVE_DEV_OF_NODE=$(HAVE_DEV_OF_NODE) \
+ 			-DGPIB_CONFIG_PCMCIA=$(GPIB_CONFIG_PCMCIA) \
+@@ -17,7 +20,9 @@
+ obj-y += hp_82335/
+ obj-y += hp_82341/
+ obj-y += ines/
+-obj-$(CONFIG_USB) += lpvo_usb_gpib/
++ifeq (${KERNEL_GE_5_10},0)
++	obj-$(CONFIG_USB) += lpvo_usb_gpib/
++endif
+ obj-y += nec7210/
+ obj-$(CONFIG_USB) += ni_usb/
+ ifeq ($(CONFIG_GPIB_ISA),yes)

@@ -1,0 +1,11 @@
+--- linux-gpib-user-4.3.3/lib/libgpib.pc.in~	2020-05-09 10:08:14.000000000 +0200
++++ linux-gpib-user-4.3.3/lib/libgpib.pc.in	2021-02-24 22:11:20.744857867 +0100
+@@ -6,7 +6,7 @@
+ 
+ Name: libgpib
+ Description:  Linux-GPIB the IEEE-488 card support package and measurement suite for LINUX
+-Version: @GPIB_SO_VERSION@
++Version: @VERSION@
+ Requires: 
+ Libs: -lgpib
+ Cflags: -I${includedir}

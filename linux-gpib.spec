@@ -58,9 +58,7 @@ BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
 BuildRequires:	libtool
 BuildRequires:	rpmbuild(macros) >= 1.745
-%if %{with kernel}
-BuildRequires:	kernel-module-build >= 3:2.6.8
-%endif
+%{?with_kernel:%{expand:%buildrequires_kernel kernel%%{_alt_kernel}-module-build >= 3:2.6.32}}
 %if %{with userspace}
 BuildRequires:	bison
 %{?with_doc:BuildRequires:	docbook-utils}

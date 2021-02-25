@@ -1,10 +1,10 @@
---- linux-gpib-kernel-4.3.3.org/drivers/gpib/Makefile	2020-05-09 10:08:29.000000000 +0200
-+++ linux-gpib-kernel-4.3.3/drivers/gpib/Makefile	2021-02-25 21:36:41.392550371 +0100
-@@ -15,7 +15,6 @@ obj-y += cec/
+--- linux-gpib-kernel-4.3.3.org/drivers/gpib/Makefile	2021-02-25 21:53:53.399328345 +0100
++++ linux-gpib-kernel-4.3.3/drivers/gpib/Makefile	2021-02-25 21:53:53.472661757 +0100
+@@ -18,7 +18,6 @@ obj-y += cec/
  obj-$(CONFIG_OF) += eastwood/
  obj-$(CONFIG_OF) += fmh_gpib/
  obj-y += hp_82335/
 -obj-y += hp_82341/
  obj-y += ines/
- obj-$(CONFIG_USB) += lpvo_usb_gpib/
- obj-y += nec7210/
+ ifeq (${KERNEL_GE_5_10},0)
+ 	obj-$(CONFIG_USB) += lpvo_usb_gpib/

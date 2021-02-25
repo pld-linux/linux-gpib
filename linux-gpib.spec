@@ -288,10 +288,10 @@ cd ..
 %if %{with kernel}
 tar xzf linux-gpib-kernel-%{version}.tar.gz
 cd linux-gpib-kernel-%{version}
+%patch9 -p1
 %ifarch %{ix86}
 %patch8 -p1
 %endif
-%patch9 -p1
 %endif
 
 %build

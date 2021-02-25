@@ -1,5 +1,5 @@
---- linux-gpib-kernel-4.3.3.org/drivers/gpib/Makefile	2021-02-25 21:36:41.492550196 +0100
-+++ linux-gpib-kernel-4.3.3/drivers/gpib/Makefile	2021-02-25 21:36:41.562550074 +0100
+--- linux-gpib-kernel-4.3.3.org/drivers/gpib/Makefile	2020-05-09 10:08:29.000000000 +0200
++++ linux-gpib-kernel-4.3.3/drivers/gpib/Makefile	2021-02-25 21:49:38.659087538 +0100
 @@ -2,6 +2,9 @@ ifneq ($(LINUXINCLUDE),)
  	LINUXINCLUDE := -I$(GPIB_TOP_DIR)/compat/include $(LINUXINCLUDE)
  endif
@@ -10,9 +10,9 @@
  subdir-ccflags-y := -I$(src)/include \
  			-DHAVE_DEV_OF_NODE=$(HAVE_DEV_OF_NODE) \
  			-DGPIB_CONFIG_PCMCIA=$(GPIB_CONFIG_PCMCIA) \
-@@ -16,7 +19,9 @@ obj-$(CONFIG_OF) += eastwood/
- obj-$(CONFIG_OF) += fmh_gpib/
+@@ -17,7 +20,9 @@ obj-$(CONFIG_OF) += fmh_gpib/
  obj-y += hp_82335/
+ obj-y += hp_82341/
  obj-y += ines/
 -obj-$(CONFIG_USB) += lpvo_usb_gpib/
 +ifeq (${KERNEL_GE_5_10},0)

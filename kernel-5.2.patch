@@ -1,8 +1,8 @@
---- linux-gpib-kernel-4.2.0/drivers/gpib/Makefile~	2018-11-07 15:58:07.000000000 +0100
-+++ linux-gpib-kernel-4.2.0/drivers/gpib/Makefile	2019-07-12 16:49:53.176504410 +0200
-@@ -6,7 +6,6 @@
- obj-y += cec/
- obj-y += fmh_gpib/
+--- linux-gpib-kernel-4.3.3.org/drivers/gpib/Makefile	2020-05-09 10:08:29.000000000 +0200
++++ linux-gpib-kernel-4.3.3/drivers/gpib/Makefile	2021-02-25 21:36:41.392550371 +0100
+@@ -15,7 +15,6 @@ obj-y += cec/
+ obj-$(CONFIG_OF) += eastwood/
+ obj-$(CONFIG_OF) += fmh_gpib/
  obj-y += hp_82335/
 -obj-y += hp_82341/
  obj-y += ines/

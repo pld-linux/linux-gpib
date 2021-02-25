@@ -25,6 +25,11 @@
 exit 1
 %endif
 
+%if %{without userspace}
+# nothing to be placed to debuginfo package
+%define		_enable_debug_packages	0
+%endif
+
 %ifnarch %{ix86}
 %undefine	with_drivers_isa
 %endif

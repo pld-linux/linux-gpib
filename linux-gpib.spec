@@ -39,17 +39,17 @@ exit 1
 
 %define		php_name	php%{?php_suffix}
 
-%define		rel	4
+%define		rel	1
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
 Name:		%{pname}%{?_pld_builder:%{?with_kernel:-kernel}}%{_alt_kernel}
-Version:	4.3.3
+Version:	4.3.4
 Release:	%{rel}%{?_pld_builder:%{?with_kernel:@%{_kernel_ver_str}}}
 License:	GPL v2+
 Group:		Applications/System
 Source0:	http://downloads.sourceforge.net/linux-gpib/%{pname}-%{version}.tar.gz
-# Source0-md5:	1243aa44f788cf23f9b40ded54c14685
+# Source0-md5:	d42b04d3b27a601c9b893915d5fded37
 Patch2:		%{pname}-python.patch
 Patch3:		%{pname}-perl.patch
 Patch4:		%{pname}-firmwaredir.patch
@@ -446,9 +446,11 @@ fi
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/gpib.conf
 %attr(755,root,root) %{_bindir}/ibterm
 %attr(755,root,root) %{_bindir}/ibtest
+%attr(755,root,root) %{_bindir}/findlisteners
 %attr(755,root,root) %{_sbindir}/gpib_config
 /lib/udev/rules.d/98-gpib-generic.rules
 /lib/udev/rules.d/99-agilent_82357a.rules
+/lib/udev/rules.d/99-lpvo_usb_gpib.rules
 /lib/udev/rules.d/99-ni_usb_gpib.rules
 %attr(755,root,root) /lib/udev/gpib_udev_config
 %attr(755,root,root) /lib/udev/gpib_udev_fxloader

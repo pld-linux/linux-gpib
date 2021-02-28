@@ -256,6 +256,7 @@ Ten pakiet zawiera sterowniki dla Linuksa do urządzeń GPIB (IEEE 488).\
 %{nil}
 
 %define build_kernel_pkg()\
+%{__make} VERBOSE=1 LINUX_SRCDIR=%{_kernelsrcdir} clean\
 %{__make} VERBOSE=1 LINUX_SRCDIR=%{_kernelsrcdir}\
 cd drivers/gpib\
 %if %{_kernel_version_code} < %{_kernel_version_magic 5 10 0}\

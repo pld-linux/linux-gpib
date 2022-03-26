@@ -1,0 +1,16 @@
+--- linux-gpib-user-4.3.4/configure.ac~	2022-03-26 10:55:11.000000000 +0100
++++ linux-gpib-user-4.3.4/configure.ac	2022-03-26 10:57:43.364009520 +0100
+@@ -106,11 +106,12 @@
+ 
+ dnl Checks for libraries.
+ if test "$BIND_GUILE" = "yes"; then
++AC_CHECK_LIB([guile-3.0],[scm_c_define],[:],[
+ AC_CHECK_LIB([guile-2.2],[scm_c_define],[:],[
+ AC_CHECK_LIB([guile-2.0],[scm_c_define],[:],[
+ AC_CHECK_LIB([guile],[gh_define],[echo this prevents default actions from occurring > /dev/null],
+ 	[BIND_GUILE="no";AC_MSG_NOTICE([libguile not found, disabling guile binding])],[])
+-])])
++])])])
+ fi
+ 
+ AC_CHECK_LIB([readline], [readline], 

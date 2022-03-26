@@ -39,7 +39,7 @@ exit 1
 
 %define		php_name	php%{?php_suffix}
 
-%define		rel	7
+%define		rel	8
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
@@ -58,6 +58,7 @@ Patch6:		%{pname}-php7.patch
 Patch8:		kernel-5.2.patch
 Patch9:		kernel-5.10.patch
 Patch10:	pkgconfig-version.patch
+Patch11:	linux-gpib-guile3.patch
 URL:		http://linux-gpib.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -288,6 +289,7 @@ cd linux-gpib-user-%{version}
 %patch5 -p1
 #%patch6 -p1
 %patch10 -p1
+%patch11 -p1
 cd ..
 %endif
 
@@ -309,7 +311,7 @@ cd linux-gpib-user-%{version}
 %{__autoheader}
 %{__automake}
 %if %{with guile}
-CPPFLAGS="%{rpmcppflags} -I/usr/include/guile/2.2"
+CPPFLAGS="%{rpmcppflags} -I/usr/include/guile/3.0"
 %endif
 %configure \
 	--with-udev-libdir=/lib/udev \

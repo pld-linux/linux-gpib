@@ -39,17 +39,17 @@ exit 1
 
 %define		php_name	php%{?php_suffix}
 
-%define		rel	10
+%define		rel	1
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
 Name:		%{pname}%{?_pld_builder:%{?with_kernel:-kernel}}%{_alt_kernel}
-Version:	4.3.4
+Version:	4.3.6
 Release:	%{rel}%{?_pld_builder:%{?with_kernel:@%{_kernel_ver_str}}}
 License:	GPL v2+
 Group:		Applications/System
 Source0:	http://downloads.sourceforge.net/linux-gpib/%{pname}-%{version}.tar.gz
-# Source0-md5:	d42b04d3b27a601c9b893915d5fded37
+# Source0-md5:	ffefc4e5c03b891c57f406a4b82395b7
 Patch2:		%{pname}-python.patch
 Patch3:		%{pname}-perl.patch
 Patch4:		%{pname}-firmwaredir.patch

@@ -1,0 +1,10 @@
+--- linux-gpib-4.3.6/linux-gpib-kernel-4.3.6/drivers/gpib/pc2/pc2_init.c~	2022-08-22 18:07:00.000000000 +0200
++++ linux-gpib-4.3.6/linux-gpib-kernel-4.3.6/drivers/gpib/pc2/pc2_init.c	2023-07-31 10:51:41.010507617 +0200
+@@ -25,6 +25,7 @@
+ #include <asm-generic/dma.h>
+ #include <linux/string.h>
+ #include <linux/init.h>
++#include <linux/dma-mapping.h>
+ 
+ MODULE_LICENSE("GPL");
+ 

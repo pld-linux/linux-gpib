@@ -1,7 +1,7 @@
 #
 # Conditional build:
 %bcond_without	kernel		# kernel modules
-%bcond_with	drivers_isa	# ISA kernel drivers [ix86 only]
+%bcond_without	drivers_isa	# ISA kernel drivers [ix86 only]
 %bcond_without	drivers_usb	# USB kernel drivers
 %bcond_without	userspace	# userspace packages
 %bcond_without	verbose		# verbose modules build (V=1)
@@ -59,6 +59,7 @@ Patch8:		kernel-5.2.patch
 Patch9:		kernel-5.10.patch
 Patch10:	pkgconfig-version.patch
 Patch11:	linux-gpib-guile3.patch
+Patch12:	isa-dma.patch
 URL:		http://linux-gpib.sourceforge.net/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake
@@ -258,7 +259,7 @@ Ten pakiet zawiera sterowniki dla Linuksa do urządzeń GPIB (IEEE 488).\
 
 %define build_kernel_pkg()\
 %{__make} VERBOSE=1 LINUX_SRCDIR=%{_kernelsrcdir} clean\
-%{__make} VERBOSE=1 LINUX_SRCDIR=%{_kernelsrcdir} %{?with_drivers_isa:ENABLE_ISA=m}%{!?with_drivers_isa:ENABLE_ISA=n}\
+%{__make} VERBOSE=1 LINUX_SRCDIR=%{_kernelsrcdir}\
 cd drivers/gpib\
 %if %{_kernel_version_code} < %{_kernel_version_magic 5 10 0}\
 %if %{with drivers_usb}\
@@ -300,6 +301,7 @@ cd linux-gpib-kernel-%{version}
 %ifarch %{ix86}
 %patch8 -p1
 %endif
+%patch12 -p1
 %endif
 
 %build

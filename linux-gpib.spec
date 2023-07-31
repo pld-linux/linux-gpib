@@ -1,7 +1,7 @@
 #
 # Conditional build:
 %bcond_without	kernel		# kernel modules
-%bcond_without	drivers_isa	# ISA kernel drivers [ix86 only]
+%bcond_with	drivers_isa	# ISA kernel drivers [ix86 only]
 %bcond_without	drivers_usb	# USB kernel drivers
 %bcond_without	userspace	# userspace packages
 %bcond_without	verbose		# verbose modules build (V=1)
@@ -39,7 +39,7 @@ exit 1
 
 %define		php_name	php%{?php_suffix}
 
-%define		rel	1
+%define		rel	2
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa

@@ -39,7 +39,7 @@ exit 1
 
 %define		php_name	php%{?php_suffix}
 
-%define		rel	3
+%define		rel	4
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
@@ -284,24 +284,24 @@ cd ../..\
 %if %{with userspace}
 tar xzf linux-gpib-user-%{version}.tar.gz
 cd linux-gpib-user-%{version}
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-#%patch6 -p1
-%patch10 -p1
-%patch11 -p1
+%patch -P 2 -p1
+%patch -P 3 -p1
+%patch -P 4 -p1
+%patch -P 5 -p1
+#patch -P 6 -p1
+%patch -P 10 -p1
+%patch -P 11 -p1
 cd ..
 %endif
 
 %if %{with kernel}
 tar xzf linux-gpib-kernel-%{version}.tar.gz
 cd linux-gpib-kernel-%{version}
-%patch9 -p1
+%patch -P 9 -p1
 %ifarch %{ix86}
-%patch8 -p1
+%patch -P 8 -p1
 %endif
-%patch12 -p1
+%patch -P 12 -p1
 %endif
 
 %build

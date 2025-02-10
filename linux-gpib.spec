@@ -9,12 +9,12 @@
 %bcond_without	doc		# documentation build
 %bcond_with	hotplug		# legacy hotplug support
 %bcond_without	static_libs	# static library
-%bcond_without	guile		# guile binding
+%bcond_with	guile		# guile binding
 %bcond_without	perl		# Perl binding
 %bcond_with	php		# PHP binding
 %bcond_without	python		# Python (any) binding
 %bcond_without	python2		# Python 2.x binding
-%bcond_without	tcl		# Tcl binding
+%bcond_with	tcl		# Tcl binding
 
 # The goal here is to have main, userspace, package built once with
 # simple release number, and only rebuild kernel packages with kernel
@@ -39,7 +39,7 @@ exit 1
 
 %define		php_name	php%{?php_suffix}
 
-%define		rel	4
+%define		rel	5
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa

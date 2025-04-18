@@ -13,7 +13,7 @@
 %bcond_without	perl		# Perl binding
 %bcond_with	php		# PHP binding
 %bcond_without	python		# Python (any) binding
-%bcond_without	python2		# Python 2.x binding
+%bcond_with	python2		# Python 2.x binding
 %bcond_with	tcl		# Tcl binding
 
 # The goal here is to have main, userspace, package built once with
@@ -39,7 +39,7 @@ exit 1
 
 %define		php_name	php%{?php_suffix}
 
-%define		rel	7
+%define		rel	8
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa

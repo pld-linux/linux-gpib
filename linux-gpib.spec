@@ -39,7 +39,7 @@ exit 1
 
 %define		php_name	php%{?php_suffix}
 
-%define		rel	9
+%define		rel	10
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
@@ -228,7 +228,7 @@ Linux-GPIB tools and library documentation.
 %description doc -l pl.UTF-8
 Dokumentacja narzędzi i biblioteki Linux-GPIB.
 
-%define kernel_pkg()\
+%define kernel_pkg() \
 %package -n kernel%{_alt_kernel}-gpib\
 Summary:	Linux GPIB drivers\
 Summary(pl.UTF-8):	Sterowniki GPIB dla Linuksa\
@@ -257,7 +257,7 @@ Ten pakiet zawiera sterowniki dla Linuksa do urządzeń GPIB (IEEE 488).\
 %depmod %{_kernel_ver}\
 %{nil}
 
-%define build_kernel_pkg()\
+%define build_kernel_pkg() \
 %{__make} VERBOSE=1 LINUX_SRCDIR=%{_kernelsrcdir} clean\
 %{__make} VERBOSE=1 LINUX_SRCDIR=%{_kernelsrcdir}\
 cd drivers/gpib\

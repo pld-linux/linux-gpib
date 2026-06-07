@@ -39,7 +39,7 @@ exit 1
 
 %define		php_name	php%{?php_suffix}
 
-%define		rel	10
+%define		rel	11
 %define		pname	linux-gpib
 Summary:	GPIB (IEEE 488) Linux support
 Summary(pl.UTF-8):	Obsługa GPIB (IEEE 488) dla Linuksa
@@ -274,7 +274,7 @@ cd drivers/gpib\
 cd ../..\
 %{nil}
 
-%define install_kernel_pkg()\
+%define install_kernel_pkg() \
 %{nil}
 
 %{?with_kernel:%{expand:%create_kernel_packages}}
